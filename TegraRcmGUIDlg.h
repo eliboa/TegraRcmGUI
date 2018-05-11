@@ -14,7 +14,7 @@ public:
 	CBitmapPicture RCM_BITMAP1;
 	CBitmapPicture RCM_BITMAP2;
 	CBitmapPicture RCM_BITMAP3;
-
+	CMFCEditBrowseCtrl m_EditBrowse;
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -29,7 +29,7 @@ public:
 protected:
 	HICON m_hIcon;
 	// Generated message map functions
-	virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog();	
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnIdle();
 	afx_msg void OnShowWindow();
@@ -44,4 +44,5 @@ public:
 	afx_msg void OnEnChangePath();
 	afx_msg void OnBnClickedButton();
 	afx_msg void OnBnClickedShofel2();
+
 };

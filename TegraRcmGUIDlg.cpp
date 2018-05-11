@@ -55,7 +55,8 @@ void CTegraRcmGUIDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, RCM_PIC_1, RCM_BITMAP1);
 	DDX_Control(pDX, RCM_PIC_2, RCM_BITMAP2);
 	DDX_Control(pDX, RCM_PIC_3, RCM_BITMAP3);
-	DDX_Control(pDX, RCM_PIC_4, RCM_BITMAP0);
+	DDX_Control(pDX, RCM_PIC_4, RCM_BITMAP0);	
+	DDX_Control(pDX, PAYLOAD_PATH, m_EditBrowse);
 }
 
 BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
@@ -79,6 +80,7 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED);
 	RCM_BITMAP2.SetBitmap(DRIVER_KO);
 	RCM_BITMAP3.SetBitmap(RCM_DETECTED);
+	SendMessage(PAYLOAD_PATH, BM_CLICK, 0);
 
 	// Add "About..." menu item to system menu.
 
@@ -249,11 +251,21 @@ void CTegraRcmGUIDlg::OnBnClickedButton()
 	TCHAR* args[2];
 	args[0] = TEXT("");
 	args[1] = PAYLOAD_FILE;
+	string s;
+
+	if (PAYLOAD_FILE == nullptr) {
+		s = "No file selected !";
+		CA2T wt(s.c_str());
+		CTegraRcmGUIDlg::SetDlgItemText(INFO_LABEL, wt);
+		LOOP_WAIT = 0;
+		return;
+	}
+
 
 	TegraRcmSmash device;
 	int rc = device.SmashMain(2, args);
 	
-	string s;
+
 	if (rc >= 0)
 	{
 		s = "Payload injected !";
@@ -282,11 +294,39 @@ void CTegraRcmGUIDlg::OnBnClickedShofel2()
 		csPath.Empty();
 	}
 
-	CString COREBOOT = _T("CBFS+") + csPath + _T("\\shofel2\\coreboot\\coreboot.rom");
+	string s;
+	CString COREBOOT_FILE = csPath + _T("\\shofel2\\coreboot\\coreboot.rom");
+	CString COREBOOT = _T("CBFS+") + COREBOOT_FILE;
 	CString PAYLOAD = csPath + _T("\\shofel2\\coreboot\\cbfs.bin");
+	std::ifstream infile(COREBOOT_FILE);
+	BOOL coreboot_exists = infile.good();
+	std::ifstream infile2(PAYLOAD);
+	BOOL payload_exists = infile2.good();
+
+	if (!coreboot_exists || !payload_exists) {
+		s = "Linux kernel found not found in \\shofel2 dir";
+		CA2T wt(s.c_str());
+		CTegraRcmGUIDlg::SetDlgItemText(INFO_LABEL, wt);
+
+		
+		CString message = _T("Kernel not found in shofel2 directory. Do you want to automatically download arch linux kernel from SoulCipher repo ?");
+		const int result = MessageBox(message, _T("Kernel not found"), MB_YESNOCANCEL | MB_ICONQUESTION);
+		if (result == IDYES) 
+		{
+			PROCESS_INFORMATION pif;
+			STARTUPINFO si;
+			ZeroMemory(&si, sizeof(si));
+			si.cb = sizeof(si);
+			CString download_script = csPath + _T("\\shofel2\\download.bat");
+			BOOL bRet = CreateProcess(download_script, NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pif);
+		} 
+
+		LOOP_WAIT = 0;
+		return;
+	}
+
 	TCHAR* payload_f = _tcsdup(PAYLOAD);
 	TCHAR* coreboot_f = _tcsdup(COREBOOT);
-	string s;
 	TCHAR* args[5];
 	args[0] = TEXT("");
 	args[1] = TEXT("-w");
