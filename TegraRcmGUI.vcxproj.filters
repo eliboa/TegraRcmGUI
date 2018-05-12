@@ -98,5 +98,20 @@
     <Image Include="res\rcm_undetected2.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\driver_ko.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\init_logo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\rcm_detected.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\rcm_undetected.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

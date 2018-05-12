@@ -6,29 +6,7 @@
 #include "afxdialogex.h"
 #include "TegraRcmGUI.h"
 #include "TegraRcmGUIDlg.h"
-#include "TegraRcmSmash.h"
-#include "res/BitmapPicture.h"
-#include <windows.h>
-#include <string> 
-#include <thread>
-#include <iostream>
-#include <sstream>
-#include <cstdio>
-#include <memory>
-#include <stdexcept>
-#include <array>
 
-std::string exec(const char* cmd) {
-	std::array<char, 128> buffer;
-	std::string result;
-	std::shared_ptr<FILE> pipe(_popen(cmd, "r"), _pclose);
-	if (!pipe) throw std::runtime_error("_popen() failed!");
-	while (!feof(pipe.get())) {
-		if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
-			result += buffer.data();
-	}
-	return result;
-}
 
 using namespace std;
 
@@ -39,6 +17,11 @@ using namespace std;
 TCHAR* PAYLOAD_FILE;
 int RCM_STATUS = -10;
 int LOOP_WAIT = 0;
+BOOL WAITING_RECONNECT = FALSE;
+BOOL AUTOINJECT_CURR= FALSE;
+BOOL PREVENT_AUTOINJECT= TRUE;
+BOOL DELAY_AUTOINJECT = FALSE;
+CString csPath;
 
 // CTegraRcmGUIDlg dialog
 
@@ -76,15 +59,30 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	TCHAR szPath[_MAX_PATH];
+	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
+	CString csPathf(szPath);
+	int nIndex = csPathf.ReverseFind(_T('\\'));
+	if (nIndex > 0) csPath = csPathf.Left(nIndex);
+	else csPath.Empty();
+
 	RCM_BITMAP0.SetBitmap(INIT_LOGO);
 	RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED);
 	RCM_BITMAP2.SetBitmap(DRIVER_KO);
 	RCM_BITMAP3.SetBitmap(RCM_DETECTED);
-	SendMessage(PAYLOAD_PATH, BM_CLICK, 0);
 
-	// Add "About..." menu item to system menu.
+	string value = GetPreset("AUTO_INJECT");
+	if (value == "TRUE")
+	{
+		AUTOINJECT_CURR = TRUE;
+		CMFCButton*checkbox = (CMFCButton*)GetDlgItem(AUTO_INJECT);
+		checkbox->SetCheck(BST_CHECKED);
+	}
+	CString file(GetPreset("PAYLOAD_FILE").c_str());
+	this->GetDlgItem(PAYLOAD_PATH)->SetWindowTextW(file);
+	//PREVENT_AUTOINJECT = TRUE;
 
-	// IDM_ABOUTBOX must be in the system command range.
+	
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -185,6 +183,23 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 {
 	if (nIDEvent == ID_TIMER_SECONDS)
 	{
+
+		CButton *m_ctlCheck = (CButton*)GetDlgItem(AUTO_INJECT);
+		BOOL IsCheckChecked = (m_ctlCheck->GetCheck() == 1) ? true : false;
+		if (AUTOINJECT_CURR != IsCheckChecked)
+		{
+			if (IsCheckChecked)
+			{
+				SetPreset("AUTO_INJECT", "TRUE");
+				DELAY_AUTOINJECT = TRUE;
+			}
+			else
+			{
+				SetPreset("AUTO_INJECT", "FALSE");
+				DELAY_AUTOINJECT = FALSE;
+			}
+			AUTOINJECT_CURR = IsCheckChecked;
+		}
 		
 		TegraRcmSmash device;
 		int rc = device.RcmStatus();
@@ -209,7 +224,7 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 			pCtrl3->ShowWindow(SW_HIDE);
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
-			s = "Please Install the lbusbK driver (download Zadig)";
+			s = "Install lbusbK driver (download Zadig)";
 
 		}
 		else
@@ -220,14 +235,37 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 			s = "Waiting for Switch in RCM mode.";
+
+			string value = GetPreset("AUTO_INJECT");
+			if (value == "TRUE")
+			{
+				DELAY_AUTOINJECT = TRUE;
+			}
 		}	
 
 		if (rc != RCM_STATUS)
 		{
 			CStatic*pCtrl0 = (CStatic*)GetDlgItem(RCM_PIC_4);
 			pCtrl0->ShowWindow(SW_HIDE);
-			CA2T wt(s.c_str());
-			SetDlgItemText(INFO_LABEL, wt);
+
+			if (rc == 0)
+			{
+				CString file;
+				this->GetDlgItem(PAYLOAD_PATH)->GetWindowTextW(file);
+
+				if (DELAY_AUTOINJECT && file.GetLength() > 0)
+				{
+					InjectPayload();
+					DELAY_AUTOINJECT = FALSE;
+				}
+				else
+				{
+					s = "\nSelect a payload :";
+					CA2T wt(s.c_str());
+					SetDlgItemText(INFO_LABEL, wt);
+				}
+			}
+			if (rc <= -5) WAITING_RECONNECT = FALSE;
 		}
 		RCM_STATUS = rc;
 	}
@@ -239,14 +277,52 @@ void CTegraRcmGUIDlg::OnEnChangePath()
 	this->GetDlgItem(PAYLOAD_PATH)->GetWindowTextW(file);
 	PAYLOAD_FILE = _tcsdup(file);
 	
-	std::string s = "";
+	if (!PREVENT_AUTOINJECT)
+	{
+		CT2CA pszConvertedAnsiString(file);
+		std::string file_c(pszConvertedAnsiString);
+		SetPreset("PAYLOAD_FILE", file_c);
+	}
+		
+	std::string s = "\nSelect a payload :";
+
+
+	CButton *m_ctlCheck = (CButton*)GetDlgItem(AUTO_INJECT);
+	BOOL IsCheckChecked = (m_ctlCheck->GetCheck() == 1) ? true : false;
+	if (IsCheckChecked && !PREVENT_AUTOINJECT)
+	{
+		if (RCM_STATUS != 0)
+		{
+			DELAY_AUTOINJECT = TRUE;
+			s = "Payload injection scheduled.\nWaiting for RCM mode.";
+		}
+		else InjectPayload();
+	}
+	PREVENT_AUTOINJECT = FALSE;
 	CA2T wt(s.c_str());
 	SetDlgItemText(INFO_LABEL, wt);
+
 }
 
 
 void CTegraRcmGUIDlg::OnBnClickedButton()
 {
+	InjectPayload();
+}
+
+
+void CTegraRcmGUIDlg::InjectPayload()
+{
+	if (WAITING_RECONNECT)
+	{
+		CString message = _T("Payload already injected. Are you sure you want to overwrite the stack again ?");
+		const int result = MessageBox(message, _T("WARNING !"), MB_YESNOCANCEL | MB_ICONQUESTION);
+		if (result != IDYES)
+		{
+			return;
+		}
+	}
+
 	LOOP_WAIT = 1;
 	TCHAR* args[2];
 	args[0] = TEXT("");
@@ -254,7 +330,7 @@ void CTegraRcmGUIDlg::OnBnClickedButton()
 	string s;
 
 	if (PAYLOAD_FILE == nullptr) {
-		s = "No file selected !";
+		s = "\nNo file selected !";
 		CA2T wt(s.c_str());
 		CTegraRcmGUIDlg::SetDlgItemText(INFO_LABEL, wt);
 		LOOP_WAIT = 0;
@@ -268,7 +344,8 @@ void CTegraRcmGUIDlg::OnBnClickedButton()
 
 	if (rc >= 0)
 	{
-		s = "Payload injected !";
+		s = "\nPayload injected !";
+		WAITING_RECONNECT = TRUE;
 	}
 	else
 	{		
@@ -304,7 +381,7 @@ void CTegraRcmGUIDlg::OnBnClickedShofel2()
 	BOOL payload_exists = infile2.good();
 
 	if (!coreboot_exists || !payload_exists) {
-		s = "Linux kernel found not found in \\shofel2 dir";
+		s = "Linux kernel not found in \\shofel2 dir";
 		CA2T wt(s.c_str());
 		CTegraRcmGUIDlg::SetDlgItemText(INFO_LABEL, wt);
 
@@ -360,7 +437,7 @@ void CTegraRcmGUIDlg::OnBnClickedShofel2()
 		}
 		else
 		{
-			s = "Payload injected !";
+			s = "\nPayload injected !";
 		}
 	}
 	else
@@ -371,4 +448,62 @@ void CTegraRcmGUIDlg::OnBnClickedShofel2()
 	SetDlgItemText(INFO_LABEL, wt2);
 
 	LOOP_WAIT = 0;
+}
+
+
+string CTegraRcmGUIDlg::GetPreset(string param)
+{
+	CString rfile = csPath + "\\presets.conf";
+	CT2A rfile_c(rfile, CP_UTF8);
+	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
+	ifstream readFile(rfile_c);
+	string readout;
+	string search = param + "=";
+	std::string value = "";
+	if (readFile.is_open())
+	{
+		while (getline(readFile, readout)) {
+			if (readout.find(search) != std::string::npos) {
+				std::string delimiter = "=";
+				value = readout.substr(readout.find(delimiter)+1, readout.length()+1);
+			}
+		}		
+	}
+	readFile.close();
+	return value;
+}
+
+void CTegraRcmGUIDlg::SetPreset(string param, string value)
+{
+	// Preset conf gfile
+	CString rfile = csPath + "\\presets.conf";
+	CString wfile = csPath + "\\presets.conf.tmp";
+	CT2A rfile_c(rfile, CP_UTF8);
+	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
+	CT2A wfile_c(wfile, CP_UTF8);
+	TRACE(_T("UTF8: %S\n"), wfile_c.m_psz);
+
+	// Replace or create preset in file
+	ofstream outFile(wfile_c);
+	ifstream readFile(rfile_c);
+	string readout;
+	string search = param + "=";
+	string replace = "\n" + search + value;
+	BOOL found = FALSE;
+	while (getline(readFile, readout)) {
+		if (readout.find(search) != std::string::npos) {
+			outFile << replace;
+			found = TRUE;
+		}
+		else {
+			outFile << readout;
+		}
+	}
+	if (!found) {
+		outFile << replace;
+	}
+	outFile.close();
+	readFile.close();
+	remove(rfile_c);
+	rename(wfile_c, rfile_c);
 }

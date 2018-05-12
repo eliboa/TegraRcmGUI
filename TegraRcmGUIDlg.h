@@ -3,6 +3,21 @@
 //
 #pragma once
 #include "res/BitmapPicture.h"
+#include <string> 
+#include "TegraRcmSmash.h"
+#include "res/BitmapPicture.h"
+#include <windows.h>
+#include <string> 
+#include <thread>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
+#include <array>
+
 
 // CTegraRcmGUIDlg dialog
 class CTegraRcmGUIDlg : public CDialog
@@ -28,7 +43,7 @@ public:
 // Implementation
 protected:
 	HICON m_hIcon;
-	// Generated message map functions
+	// Generated message map functions	
 	virtual BOOL OnInitDialog();	
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnIdle();
@@ -43,6 +58,8 @@ public:
 	int STATUS;
 	afx_msg void OnEnChangePath();
 	afx_msg void OnBnClickedButton();
+	afx_msg void InjectPayload();
 	afx_msg void OnBnClickedShofel2();
-
+	afx_msg string GetPreset(string param);
+	afx_msg void SetPreset(string param, string value);
 };

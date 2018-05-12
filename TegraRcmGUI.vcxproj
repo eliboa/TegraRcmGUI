@@ -232,9 +232,14 @@
     <None Include="res\TegraRcmGUI.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bitmap2.bmp" />
+    <Image Include="res\driver_ko.bmp" />
     <Image Include="res\driver_ko2.bmp" />
+    <Image Include="res\init_logo.bmp" />
     <Image Include="res\init_logo_2.bmp" />
+    <Image Include="res\rcm_detected.bmp" />
     <Image Include="res\rcm_detected2.bmp" />
+    <Image Include="res\rcm_undetected.bmp" />
     <Image Include="res\rcm_undetected2.bmp" />
     <Image Include="res\TegraRcmGUI.ico" />
   </ItemGroup>
