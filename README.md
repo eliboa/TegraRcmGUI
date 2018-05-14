@@ -6,4 +6,4 @@ A simple C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) 
 ![Png](http://splatoon.eu/tuto_switch/TegraRcmGUI_v1.2.png)
 
 ## Download
-[TegraRcmGUI_v1.0.1](https://github.com/eliboa/TegraRcmGUI/releases/tag/1.0.1) (Windows)
+[TegraRcmGUI_latest release](https://github.com/eliboa/TegraRcmGUI/releases) (Windows)
