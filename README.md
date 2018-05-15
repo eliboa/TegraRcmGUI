@@ -1,6 +1,5 @@
 # TegraRcmGUI
-A simple C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto)
-I dit not code the original application, only GUI parts (all credits goes to @rajkosto & @ktemkin).
+A simple C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto). I did not code the original application, only GUI parts (all credits goes to @rajkosto & @ktemkin).
 
 ## Features
 - Inject payloads (auto inject option)
