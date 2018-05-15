@@ -21,6 +21,7 @@ BOOL WAITING_RECONNECT = FALSE;
 BOOL AUTOINJECT_CURR= FALSE;
 BOOL PREVENT_AUTOINJECT= TRUE;
 BOOL DELAY_AUTOINJECT = FALSE;
+BOOL ASK_FOR_DRIVER = FALSE;
 CString csPath;
 
 // CTegraRcmGUIDlg dialog
@@ -58,6 +59,8 @@ END_MESSAGE_MAP()
 BOOL CTegraRcmGUIDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+	EnableActiveAccessibility();
 
 	TCHAR szPath[_MAX_PATH];
 	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
@@ -100,19 +103,13 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 		}
 	}
 
-	// Set the icon for this dialog.  The framework does this automatically
-	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	// TODO: Add extra initialization here
 	CTegraRcmGUIDlg::StartTimer();
 	
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	return TRUE;
 }
-
-
-
 
 void CTegraRcmGUIDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -224,8 +221,13 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 			pCtrl3->ShowWindow(SW_HIDE);
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
-			s = "Install lbusbK driver (download Zadig)";
-
+			s = "lbusbK driver is needed !";
+			if (!ASK_FOR_DRIVER)
+			{
+				ASK_FOR_DRIVER = TRUE;
+				InstallDriver();
+				
+			}
 		}
 		else
 		{
@@ -506,4 +508,29 @@ void CTegraRcmGUIDlg::SetPreset(string param, string value)
 	readFile.close();
 	remove(rfile_c);
 	rename(wfile_c, rfile_c);
+}
+
+
+void CTegraRcmGUIDlg::InstallDriver()
+{
+	CString message = _T("APX device driver is missing. Do you want to install it now ?");
+	const int result = MessageBox(message, _T("APX driver not found !"), MB_YESNOCANCEL | MB_ICONQUESTION);
+	if (result == IDYES)
+	{
+		SHELLEXECUTEINFO shExInfo = { 0 };
+		shExInfo.cbSize = sizeof(shExInfo);
+		shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		shExInfo.hwnd = 0;
+		shExInfo.lpVerb = _T("runas");                
+		CString exe_file = csPath + _T("\\apx_driver\\InstallDriver.exe");
+		shExInfo.lpFile = exe_file;
+		shExInfo.lpDirectory = 0;
+		shExInfo.nShow = SW_SHOW;
+		shExInfo.hInstApp = 0;
+
+		if (ShellExecuteEx(&shExInfo))
+		{
+			CloseHandle(shExInfo.hProcess);
+		}
+	}
 }

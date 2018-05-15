@@ -62,4 +62,5 @@ public:
 	afx_msg void OnBnClickedShofel2();
 	afx_msg string GetPreset(string param);
 	afx_msg void SetPreset(string param, string value);
+	afx_msg void InstallDriver();
 };
