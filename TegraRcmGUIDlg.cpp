@@ -74,6 +74,9 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	RCM_BITMAP2.SetBitmap(DRIVER_KO);
 	RCM_BITMAP3.SetBitmap(RCM_DETECTED);
 
+	BOOL isDriverInstalled = LookForDriver();
+	if (!isDriverInstalled) InstallDriver();
+
 	string value = GetPreset("AUTO_INJECT");
 	if (value == "TRUE")
 	{
@@ -222,12 +225,15 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 			s = "lbusbK driver is needed !";
+
+			/*
 			if (!ASK_FOR_DRIVER)
 			{
 				ASK_FOR_DRIVER = TRUE;
 				InstallDriver();
 				
 			}
+			*/
 		}
 		else
 		{
@@ -244,7 +250,7 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 				DELAY_AUTOINJECT = TRUE;
 			}
 		}	
-
+	
 		if (rc != RCM_STATUS)
 		{
 			CStatic*pCtrl0 = (CStatic*)GetDlgItem(RCM_PIC_4);
@@ -533,4 +539,13 @@ void CTegraRcmGUIDlg::InstallDriver()
 			CloseHandle(shExInfo.hProcess);
 		}
 	}
+}
+typedef int(__cdecl *MYPROC)(LPWSTR);
+
+BOOL CTegraRcmGUIDlg::LookForDriver()
+{
+	CString LIBUSBKDLL = _T("C:\\Windows\\System32\\libusbK.dll");
+	std::ifstream infile(LIBUSBKDLL);
+	BOOL file_exists = infile.good();
+	return file_exists;
 }

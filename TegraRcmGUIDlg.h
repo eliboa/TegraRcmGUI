@@ -63,4 +63,5 @@ public:
 	afx_msg string GetPreset(string param);
 	afx_msg void SetPreset(string param, string value);
 	afx_msg void InstallDriver();
+	afx_msg BOOL LookForDriver();
 };
