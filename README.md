@@ -17,7 +17,7 @@ I used TegraRcmSmash_v1.1 in this project. Since then, rajkosto released new bin
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases) (Windows)
 
 ## Credits
-- [Kate Temkin](https://github.com/ktemkin) / Fusée Gelée
-- [Rajkosto](https://github.com/rajkosto) / TegraRcmSmash (Fusée Gélée reimplementation for Windows)
-- [fail0verflow](https://github.com/fail0verflow) / ShofEL2 (boot stack for no-modification, universal code execution and Linux on the Nintendo Switch)
+- [Kate Temkin](https://github.com/ktemkin) / Fusée Launcher
+- [Rajkosto](https://github.com/rajkosto) / TegraRcmSmash (Fusée Launcher reimplementation for Windows)
+- [fail0verflow](https://github.com/fail0verflow) / ShofEL2 (Boot stack for no-modification, universal code execution and Linux on the Nintendo Switch)
 
