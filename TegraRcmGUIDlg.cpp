@@ -73,10 +73,10 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED);
 	RCM_BITMAP2.SetBitmap(DRIVER_KO);
 	RCM_BITMAP3.SetBitmap(RCM_DETECTED);
-
+	
 	BOOL isDriverInstalled = LookForDriver();
 	if (!isDriverInstalled) InstallDriver();
-
+	
 	string value = GetPreset("AUTO_INJECT");
 	if (value == "TRUE")
 	{
@@ -226,14 +226,9 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 			s = "lbusbK driver is needed !";
 
-			/*
-			if (!ASK_FOR_DRIVER)
-			{
-				ASK_FOR_DRIVER = TRUE;
-				InstallDriver();
-				
-			}
-			*/
+			
+			if (!ASK_FOR_DRIVER) InstallDriver();
+			
 		}
 		else
 		{
@@ -539,13 +534,21 @@ void CTegraRcmGUIDlg::InstallDriver()
 			CloseHandle(shExInfo.hProcess);
 		}
 	}
+	ASK_FOR_DRIVER = TRUE;
 }
 typedef int(__cdecl *MYPROC)(LPWSTR);
 
+
 BOOL CTegraRcmGUIDlg::LookForDriver()
 {
-	CString LIBUSBKDLL = _T("C:\\Windows\\System32\\libusbK.dll");
-	std::ifstream infile(LIBUSBKDLL);
-	BOOL file_exists = infile.good();
-	return file_exists;
+	TCHAR system_dir[MAX_PATH];
+	HRESULT result = SHGetFolderPath(NULL, CSIDL_SYSTEM, NULL, SHGFP_TYPE_CURRENT, system_dir);
+	if (result != S_OK) return FALSE;
+	PathAppend(system_dir, _T("\\libusbK.dll"));
+	
+	
+	std::ifstream infile32(system_dir);
+	BOOL file_exists32 = infile32.good();
+	if (!file_exists32) return FALSE;
+	
 }

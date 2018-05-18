@@ -19,6 +19,7 @@
 #include <array>
 
 
+
 // CTegraRcmGUIDlg dialog
 class CTegraRcmGUIDlg : public CDialog
 {
