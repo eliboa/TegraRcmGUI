@@ -6,7 +6,7 @@ I did not code the original application, only GUI related parts (all credits goe
 I used TegraRcmSmash_v1.1 in this project. Since then, rajkosto released new binaries, check out his [website](https://switchtools.sshnuke.net/) !
 
 ## Features
-- Inject payloads, such as CFW
+- Inject payloads, such as CFW loader
 - Run Linux on your switch 
 - Auto inject option : automatically inject payload after selection or/and when the Switch is plugged in RCM mode (does not apply at startup)
 - Install APX device driver (if needed)
