@@ -21,6 +21,6 @@ I used TegraRcmSmash_v1.1 in this project. Since then, rajkosto released new bin
 - [Rajkosto](https://github.com/rajkosto) / TegraRcmSmash (Fusée Launcher reimplementation for Windows)
 - [fail0verflow](https://github.com/fail0verflow) / ShofEL2 (Boot stack for no-modification, universal code execution and Linux on the Nintendo Switch)
 
-## How to install CFW + Homebrew Launcher (FW 4.x -> 5.x)
+## How to install Hekate "CFW" + Homebrew Launcher (FW 4.x -> 5.x)
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/25SnHathrHk/0.jpg)](https://www.youtube.com/watch?v=25SnHathrHk)
 
