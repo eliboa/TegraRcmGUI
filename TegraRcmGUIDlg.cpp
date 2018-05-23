@@ -17,7 +17,6 @@ using namespace std;
 TCHAR* PAYLOAD_FILE;
 int RCM_STATUS = -10;
 BOOL WAITING_RECONNECT = FALSE;
-BOOL AUTOINJECT = FALSE;
 BOOL AUTOINJECT_CURR = FALSE;
 BOOL PREVENT_AUTOINJECT = TRUE;
 BOOL DELAY_AUTOINJECT = FALSE;
@@ -42,10 +41,14 @@ void CTegraRcmGUIDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, RCM_PIC_2, RCM_BITMAP2);
 	DDX_Control(pDX, RCM_PIC_3, RCM_BITMAP3);
 	DDX_Control(pDX, RCM_PIC_4, RCM_BITMAP0);
+	DDX_Control(pDX, RCM_PIC_5, RCM_BITMAP4);
+	DDX_Control(pDX, RCM_PIC_6, RCM_BITMAP5);
+	DDX_Control(pDX, RCM_PIC_7, RCM_BITMAP6);
 	DDX_Control(pDX, PAYLOAD_PATH, m_EditBrowse);
 }
 
 BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
+	ON_WM_CTLCOLOR()
 	ON_WM_TIMER()
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
@@ -57,6 +60,22 @@ BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
 END_MESSAGE_MAP()
 
 
+
+HBRUSH CTegraRcmGUIDlg::OnCtlColor(CDC* pDC, CWnd *pWnd, UINT nCtlColor)
+{
+	switch (nCtlColor)
+	{
+	case CTLCOLOR_STATIC:
+		if (GetDlgItem(IDC_RAJKOSTO)->GetSafeHwnd() == pWnd->GetSafeHwnd() || GetDlgItem(SEPARATOR)->GetSafeHwnd() == pWnd->GetSafeHwnd())
+		{
+			pDC->SetTextColor(RGB(192, 192, 192));
+			pDC->SetBkMode(TRANSPARENT);
+			return (HBRUSH)GetStockObject(NULL_BRUSH);
+		}	
+	default:
+		return CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+	}
+}
 // CTegraRcmGUIDlg message handlers
 
 BOOL CTegraRcmGUIDlg::OnInitDialog()
@@ -79,24 +98,31 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED);
 	RCM_BITMAP2.SetBitmap(DRIVER_KO);
 	RCM_BITMAP3.SetBitmap(RCM_DETECTED);
+	RCM_BITMAP4.SetBitmap(LOADING);
+	RCM_BITMAP5.SetBitmap(LOADED);
+	RCM_BITMAP6.SetBitmap(LOAD_ERROR);
+
+	BitmapDisplay(INIT_LOGO);
 
 	// Check for APX driver at startup
-	BOOL isDriverInstalled = LookForDriver();
-	if (!isDriverInstalled) InstallDriver();
+	//BOOL isDriverInstalled = LookForDriver();
+	//if (!isDriverInstalled) InstallDriver();
 
 	// Read & apply presets
 	string value = GetPreset("AUTO_INJECT");
 	if (value == "TRUE")
 	{
-		AUTOINJECT = TRUE;
 		AUTOINJECT_CURR = TRUE;
-		CMFCButton*checkbox = (CMFCButton*)GetDlgItem(AUTOINJECT);
+		CMFCButton*checkbox = (CMFCButton*)GetDlgItem(AUTO_INJECT);
 		checkbox->SetCheck(BST_CHECKED);
+		
 	}
-	CString file(GetPreset("PAYLOAD_FILE").c_str());
+	
+	string pfile = GetPreset("PAYLOAD_FILE");
+	CString file(pfile.c_str());
 	this->GetDlgItem(PAYLOAD_PATH)->SetWindowTextW(file);
 	//PREVENT_AUTOINJECT = TRUE;
-
+	
 	// Menu
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
@@ -180,6 +206,54 @@ void CTegraRcmGUIDlg::StopTimer()
 	KillTimer(ID_TIMER_SECONDS);
 }
 
+void CTegraRcmGUIDlg::BitmapDisplay(int IMG)
+{
+	// Init & bitmap pointers
+	CStatic*pRcm_not_detected = (CStatic*)GetDlgItem(RCM_PIC_1);
+	CStatic*pDriverKO = (CStatic*)GetDlgItem(RCM_PIC_2);
+	CStatic*pRcm_detected = (CStatic*)GetDlgItem(RCM_PIC_3);
+	CStatic*pInitLogo = (CStatic*)GetDlgItem(RCM_PIC_4);
+	CStatic*pLoading = (CStatic*)GetDlgItem(RCM_PIC_5);
+	CStatic*pLoaded = (CStatic*)GetDlgItem(RCM_PIC_6);
+	CStatic*pError = (CStatic*)GetDlgItem(RCM_PIC_7);
+
+	pRcm_not_detected->ShowWindow(SW_HIDE);
+	pDriverKO->ShowWindow(SW_HIDE);
+	pRcm_detected->ShowWindow(SW_HIDE);
+	pInitLogo->ShowWindow(SW_HIDE);
+	pLoading->ShowWindow(SW_HIDE);
+	pLoaded->ShowWindow(SW_HIDE);
+	pError->ShowWindow(SW_HIDE);
+
+	switch (IMG)
+	{
+		case INIT_LOGO:
+			pInitLogo->ShowWindow(SW_SHOW);			
+			break;
+		case RCM_NOT_DETECTED:
+			pRcm_not_detected->ShowWindow(SW_SHOW);
+			break;
+		case DRIVER_KO:
+			pDriverKO->ShowWindow(SW_SHOW);
+			break;
+		case RCM_DETECTED:
+			pRcm_detected->ShowWindow(SW_SHOW);
+			break;
+		case LOADING:
+			pLoading->ShowWindow(SW_SHOW);
+			UpdateWindow();
+			break;
+		case LOADED:
+			pLoaded->ShowWindow(SW_SHOW);
+			break;
+		case LOAD_ERROR:
+			pError->ShowWindow(SW_SHOW);
+			break;
+		default:
+			break;
+	}
+}
+
 //
 // Timer Handler.
 void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
@@ -200,14 +274,12 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 			if (IsCheckChecked)
 			{
 				SetPreset("AUTO_INJECT", "TRUE");
-				AUTOINJECT = TRUE;
 				DELAY_AUTOINJECT = TRUE;
 			}
 			// Auto inject option disabled
 			else
 			{
 				SetPreset("AUTO_INJECT", "FALSE");
-				AUTOINJECT = FALSE;
 				DELAY_AUTOINJECT = FALSE;
 			}
 			// Save current checkbox value
@@ -219,18 +291,11 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 		TegraRcmSmash device;
 		int rc = device.RcmStatus();
 
-		// Init & bitmap pointers
-		CStatic*pCtrl1 = (CStatic*)GetDlgItem(RCM_PIC_1);
-		CStatic*pCtrl2 = (CStatic*)GetDlgItem(RCM_PIC_2);
-		CStatic*pCtrl3 = (CStatic*)GetDlgItem(RCM_PIC_3);
 		std::string s = "";
 
 		// RCM Status = "RCM detected"
 		if (rc >= 0)
 		{
-			pCtrl1->ShowWindow(SW_HIDE);
-			pCtrl2->ShowWindow(SW_HIDE);
-			pCtrl3->ShowWindow(SW_SHOW);
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(TRUE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(TRUE);
 			this->GetDlgItem(IDC_MOUNT_SD)->EnableWindow(TRUE);
@@ -239,9 +304,6 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 		// RCM Status = "USB Driver KO"
 		else if (rc > -5)
 		{
-			pCtrl1->ShowWindow(SW_HIDE);
-			pCtrl2->ShowWindow(SW_SHOW);
-			pCtrl3->ShowWindow(SW_HIDE);
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_MOUNT_SD)->EnableWindow(FALSE);
@@ -250,27 +312,27 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 		// RCM Status = "RCM not detected"
 		else
 		{
-			pCtrl1->ShowWindow(SW_SHOW);
-			pCtrl2->ShowWindow(SW_HIDE);
-			pCtrl3->ShowWindow(SW_HIDE);
 			this->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_MOUNT_SD)->EnableWindow(FALSE);
 			s = "Waiting for Switch in RCM mode.";
 
 			// Delay Auto inject if needed
-			if (AUTOINJECT) DELAY_AUTOINJECT = TRUE;
+			if (AUTOINJECT_CURR) DELAY_AUTOINJECT = TRUE;
 		}
 
 		// On change RCM status
 		if (rc != RCM_STATUS)
 		{
+			RCM_STATUS = rc;
 			CStatic*pCtrl0 = (CStatic*)GetDlgItem(RCM_PIC_4);
 			pCtrl0->ShowWindow(SW_HIDE);
 
 			// Status changed to "RCM Detected"
 			if (rc == 0)
 			{
+				BitmapDisplay(RCM_DETECTED);
+
 				CString file;
 				this->GetDlgItem(PAYLOAD_PATH)->GetWindowTextW(file);
 
@@ -286,11 +348,18 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 				}
 			}
 			// Status changed to "RCM not detected" or "USB driver KO"
-			else if (!ASK_FOR_DRIVER)
+			else
 			{
-				// Ask for driver install if not installed yet
-				BOOL isDriverInstalled = LookForDriver();
-				if (!isDriverInstalled) InstallDriver();
+				// Ask for driver install 
+				if (rc > -5)
+				{
+					BitmapDisplay(DRIVER_KO);
+					InstallDriver();
+				} 
+				else
+				{
+					BitmapDisplay(RCM_NOT_DETECTED);
+				}
 			}
 			// Status changed to "RCM not detected" -> Disable WAITING_RECONNECT flag
 			if (rc <= -5) WAITING_RECONNECT = FALSE;
@@ -341,30 +410,23 @@ void CTegraRcmGUIDlg::OnEnChangePath()
 // User payload injection
 void CTegraRcmGUIDlg::InjectPayload()
 {
-	if (WAITING_RECONNECT)
-	{
-		CString message = _T("Payload already injected. Are you sure you want to overwrite the stack again ?");
-		const int result = MessageBox(message, _T("WARNING !"), MB_YESNOCANCEL | MB_ICONQUESTION);
-		if (result != IDYES)
-		{
-			return;
-		}
-	}
-
 	string s;
 	if (PAYLOAD_FILE == nullptr) {
+		BitmapDisplay(LOAD_ERROR);
 		SetDlgItemText(INFO_LABEL, TEXT("\nNo file selected !"));
 		return;
 	}
-
+	BitmapDisplay(LOADING);
 	int rc = Smasher(PAYLOAD_FILE);
 	if (rc >= 0)
 	{
+		BitmapDisplay(LOADED);
 		s = "\nPayload injected !";
 		WAITING_RECONNECT = TRUE;
 	}
 	else
 	{
+		BitmapDisplay(LOAD_ERROR);
 		s = "Error while injecting payload (RC=" + std::to_string(rc) + ")";
 	}
 	CA2T wt(s.c_str());
@@ -401,7 +463,7 @@ void CTegraRcmGUIDlg::OnBnClickedShofel2()
 		}
 		return; // TO-DO : Remove return for coreboot injection after download
 	}
-
+	BitmapDisplay(LOADING);
 	SetDlgItemText(INFO_LABEL, TEXT("Loading coreboot. Please wait."));
 
 	//int rc = device.SmashMain(5, args);
@@ -440,10 +502,12 @@ void CTegraRcmGUIDlg::OnBnClickedShofel2()
 
 		if (rc == 0)
 		{
+			BitmapDisplay(LOADED);
 			s = "\nCoreboot loaded !";
 		}
 		else
 		{
+			BitmapDisplay(LOAD_ERROR);
 			s = "Error while loading imx_usb.exe";
 		}
 	}
@@ -553,17 +617,40 @@ BOOL CTegraRcmGUIDlg::LookForDriver()
 
 void CTegraRcmGUIDlg::OnBnClickedMountSd()
 {
+	BitmapDisplay(LOADING);
 	string s;
 	TCHAR args[] = TEXT("memloader\\memloader_usb.bin -r --dataini=memloader\\ums_sd.ini");
 	int rc = Smasher(args);
-	if (rc < 0) s = "Error while loading payload (RC=" + std::to_string(rc) + ")";
-	else s = "SD tool (by rajkosto) injected";
+	if (rc < 0)
+	{
+		
+		BitmapDisplay(LOAD_ERROR);
+		s = "Error while loading payload (RC=" + std::to_string(rc) + ")";
+	}
+	else
+	{
+		BitmapDisplay(LOADING);
+		s = "SD tool (by rajkosto) injected";
+	}
 	CA2T wt(s.c_str());
 	CTegraRcmGUIDlg::SetDlgItemText(INFO_LABEL, wt);
 }
 
 int CTegraRcmGUIDlg::Smasher(TCHAR args[])
 {
+	if (WAITING_RECONNECT)
+	{
+		CString message = _T("Payload already injected. Are you sure you want to overwrite the stack again ?");
+		const int result = MessageBox(message, _T("WARNING !"), MB_YESNOCANCEL | MB_ICONQUESTION);
+		if (result != IDYES)
+		{
+			DELAY_AUTOINJECT = FALSE;
+			RCM_STATUS = -99;
+			return -99;
+		}
+		WAITING_RECONNECT = FALSE;
+	}
+
 	SECURITY_ATTRIBUTES sa;
 	sa.nLength = sizeof(sa);
 	sa.lpSecurityDescriptor = NULL;
@@ -613,3 +700,4 @@ TCHAR* CTegraRcmGUIDlg::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 	}
 	return _T("");
 }
+

@@ -86,21 +86,6 @@
     <Image Include="res\TegraRcmGUI.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\driver_ko2.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\init_logo_2.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\rcm_detected2.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\rcm_undetected2.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\bitmap2.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\driver_ko.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -114,6 +99,21 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\..\..\..\Visual Studio 2015\Projects\TegraRcmGUI\TegraRcmGUI\res\TegraRcmGUI.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\init_log.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\error.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\loaded.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\loading.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

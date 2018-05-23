@@ -19,7 +19,6 @@
 #include <array>
 
 
-
 // CTegraRcmGUIDlg dialog
 class CTegraRcmGUIDlg : public CDialog
 {
@@ -30,8 +29,10 @@ public:
 	CBitmapPicture RCM_BITMAP1;
 	CBitmapPicture RCM_BITMAP2;
 	CBitmapPicture RCM_BITMAP3;
+	CBitmapPicture RCM_BITMAP4;
+	CBitmapPicture RCM_BITMAP5;
+	CBitmapPicture RCM_BITMAP6;
 	CMFCEditBrowseCtrl m_EditBrowse;
-
 	// Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_TEGRARCMGUI_DIALOG };
@@ -57,6 +58,7 @@ public:
 	void StopTimer();
 	void OnTimer(UINT nIDEvent);
 	int STATUS;
+	afx_msg void BitmapDisplay(int IMG);
 	afx_msg void OnEnChangePath();
 	afx_msg void InjectPayload();
 	afx_msg void OnBnClickedShofel2();
@@ -67,4 +69,5 @@ public:
 	afx_msg void OnBnClickedMountSd();
 	afx_msg int Smasher(TCHAR args[]);
 	afx_msg TCHAR* GetAbsolutePath(TCHAR *relative_path, DWORD  dwFlags);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd *pWnd, UINT nCtlColor);
 };
