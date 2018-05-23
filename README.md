@@ -19,5 +19,5 @@ Please, *DO NOT* report issue on TegraRcmSmash GitHub if you're using this appli
 
 ## Credits
 - [Kate Temkin](https://github.com/ktemkin) / Fusée Launcher
-- [Rajkosto](https://github.com/rajkosto) / TegraRcmSmash (Fusée Launcher reimplementation for Windows)
+- [Rajkosto](https://github.com/rajkosto) / TegraRcmSmash (Fusée Launcher reimplementation for Windows), momeloader, SD tool
 - [fail0verflow](https://github.com/fail0verflow) / ShofEL2 (Boot stack for no-modification, universal code execution and Linux on the Nintendo Switch)
