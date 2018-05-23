@@ -3,11 +3,11 @@
 //
 #pragma once
 #include "res/BitmapPicture.h"
-#include <string> 
+#include <string>
 #include "TegraRcmSmash.h"
 #include "res/BitmapPicture.h"
 #include <windows.h>
-#include <string> 
+#include <string>
 #include <thread>
 #include <iostream>
 #include <sstream>
@@ -23,7 +23,7 @@
 // CTegraRcmGUIDlg dialog
 class CTegraRcmGUIDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
 	CTegraRcmGUIDlg(CWnd* pParent = NULL);	// standard constructor
 	CBitmapPicture RCM_BITMAP0;
@@ -32,20 +32,20 @@ public:
 	CBitmapPicture RCM_BITMAP3;
 	CMFCEditBrowseCtrl m_EditBrowse;
 
-// Dialog Data
+	// Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_TEGRARCMGUI_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 
-// Implementation
+														// Implementation
 protected:
 	HICON m_hIcon;
-	// Generated message map functions	
-	virtual BOOL OnInitDialog();	
+	// Generated message map functions
+	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnIdle();
 	afx_msg void OnShowWindow();
@@ -58,11 +58,13 @@ public:
 	void OnTimer(UINT nIDEvent);
 	int STATUS;
 	afx_msg void OnEnChangePath();
-	afx_msg void OnBnClickedButton();
 	afx_msg void InjectPayload();
 	afx_msg void OnBnClickedShofel2();
 	afx_msg string GetPreset(string param);
 	afx_msg void SetPreset(string param, string value);
 	afx_msg void InstallDriver();
 	afx_msg BOOL LookForDriver();
+	afx_msg void OnBnClickedMountSd();
+	afx_msg int Smasher(TCHAR args[]);
+	afx_msg TCHAR* GetAbsolutePath(TCHAR *relative_path, DWORD  dwFlags);
 };

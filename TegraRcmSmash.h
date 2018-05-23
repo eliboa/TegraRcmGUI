@@ -18,7 +18,5 @@ public:
 	TegraRcmSmash();
 	~TegraRcmSmash();
 	static int RcmStatus();
-	static int Smash(TCHAR* payload, CString coreboot = _T(""));
-	static int SmashMain(int argc, TCHAR* argv[]);
 };
 

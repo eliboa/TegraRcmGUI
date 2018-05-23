@@ -113,5 +113,8 @@
     <Image Include="res\rcm_undetected.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\..\..\..\Visual Studio 2015\Projects\TegraRcmGUI\TegraRcmGUI\res\TegraRcmGUI.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -99,6 +99,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Version.lib;libusbK.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(LIBUSBK_DIR)\bin\lib\$(PlatformShortName.Replace('x64','amd64'))\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -118,10 +119,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(LIBUSBK_DIR)\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(LIBUSBK_DIR)\bin\lib\$(PlatformShortName.Replace('x64','amd64'))\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -232,6 +236,7 @@
     <None Include="res\TegraRcmGUI.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\..\..\Visual Studio 2015\Projects\TegraRcmGUI\TegraRcmGUI\res\TegraRcmGUI.ico" />
     <Image Include="res\bitmap2.bmp" />
     <Image Include="res\driver_ko.bmp" />
     <Image Include="res\driver_ko2.bmp" />
