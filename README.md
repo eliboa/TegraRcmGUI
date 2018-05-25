@@ -8,7 +8,7 @@ Please, *DO NOT* report issue on TegraRcmSmash GitHub if you're using this appli
 ## Features
 - Inject payloads, such as CFW loader
 - Run Linux on your switch
-- Mount SD as USB mass storage
+- Mount SD as USB mass storage (hard reset needed after unmounting device, hold power button down for 15sec)
 - Auto inject option : automatically inject payload after selection or/and when the Switch is plugged in RCM mode (does not apply at startup)
 - Install APX device driver (if needed)
 
