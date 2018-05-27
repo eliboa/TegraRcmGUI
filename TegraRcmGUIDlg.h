@@ -19,6 +19,11 @@
 #include <array>
 
 
+#include <setupapi.h> 
+#pragma comment (lib, "setupapi.lib")
+#include <stdio.h>
+
+
 // CTegraRcmGUIDlg dialog
 class CTegraRcmGUIDlg : public CDialog
 {
@@ -65,7 +70,7 @@ public:
 	afx_msg string GetPreset(string param);
 	afx_msg void SetPreset(string param, string value);
 	afx_msg void InstallDriver();
-	afx_msg BOOL LookForDriver();
+	afx_msg BOOL LookForAPXDevice();
 	afx_msg void OnBnClickedMountSd();
 	afx_msg int Smasher(TCHAR args[]);
 	afx_msg TCHAR* GetAbsolutePath(TCHAR *relative_path, DWORD  dwFlags);

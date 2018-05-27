@@ -9,10 +9,11 @@
 
 
 using namespace std;
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define ARRAY_SIZE 1024
 
 TCHAR* PAYLOAD_FILE;
 int RCM_STATUS = -10;
@@ -24,6 +25,8 @@ BOOL ASK_FOR_DRIVER = FALSE;
 BOOL PAUSE_LKP_DEVICE = FALSE;
 
 CString csPath;
+CString csPath2;
+
 
 // CTegraRcmGUIDlg dialog
 
@@ -105,7 +108,7 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	BitmapDisplay(INIT_LOGO);
 
 	// Check for APX driver at startup
-	//BOOL isDriverInstalled = LookForDriver();
+	//BOOL isDriverInstalled = LookForAPXDevice();
 	//if (!isDriverInstalled) InstallDriver();
 
 	// Read & apply presets
@@ -358,7 +361,15 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 				} 
 				else
 				{
-					BitmapDisplay(RCM_NOT_DETECTED);
+					if (LookForAPXDevice())
+					{						
+						BitmapDisplay(DRIVER_KO);
+						InstallDriver();
+					}
+					else
+					{
+						BitmapDisplay(RCM_NOT_DETECTED);
+					}
 				}
 			}
 			// Status changed to "RCM not detected" -> Disable WAITING_RECONNECT flag
@@ -417,7 +428,12 @@ void CTegraRcmGUIDlg::InjectPayload()
 		return;
 	}
 	BitmapDisplay(LOADING);
-	int rc = Smasher(PAYLOAD_FILE);
+
+	TCHAR cmd[MAX_PATH] = TEXT("\"");
+	lstrcat(cmd, PAYLOAD_FILE);
+	lstrcat(cmd, TEXT("\""));
+
+	int rc = Smasher(cmd);
 	if (rc >= 0)
 	{
 		BitmapDisplay(LOADED);
@@ -581,6 +597,7 @@ void CTegraRcmGUIDlg::SetPreset(string param, string value)
 
 void CTegraRcmGUIDlg::InstallDriver()
 {
+	if (ASK_FOR_DRIVER) return;
 	CString message = _T("APX device driver is missing. Do you want to install it now ?");
 	const int result = MessageBox(message, _T("APX driver not found !"), MB_YESNOCANCEL | MB_ICONQUESTION);
 	if (result == IDYES)
@@ -606,12 +623,25 @@ void CTegraRcmGUIDlg::InstallDriver()
 typedef int(__cdecl *MYPROC)(LPWSTR);
 
 
-BOOL CTegraRcmGUIDlg::LookForDriver()
+BOOL CTegraRcmGUIDlg::LookForAPXDevice()
 {
-	TCHAR *system_dir = GetAbsolutePath(TEXT("libusbK.dll"), CSIDL_SYSTEM);
-	std::ifstream infile(system_dir);
-	BOOL file_exists = infile.good();
-	return file_exists;
+	unsigned index;
+	HDEVINFO hDevInfo;
+	SP_DEVINFO_DATA DeviceInfoData;
+	TCHAR HardwareID[1024];
+	// List all connected USB devices
+	hDevInfo = SetupDiGetClassDevs(NULL, TEXT("USB"), NULL, DIGCF_PRESENT | DIGCF_ALLCLASSES);
+	for (index = 0; ; index++) {
+		DeviceInfoData.cbSize = sizeof(DeviceInfoData);
+		if (!SetupDiEnumDeviceInfo(hDevInfo, index, &DeviceInfoData)) {
+			return FALSE;     // no match
+		}
+		SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_HARDWAREID, NULL, (BYTE*)HardwareID, sizeof(HardwareID), NULL);
+		if (_tcsstr(HardwareID, _T("VID_0955&PID_7321"))) {
+			return TRUE;     // match
+		}
+	}
+	return FALSE;
 }
 
 
@@ -691,7 +721,22 @@ int CTegraRcmGUIDlg::Smasher(TCHAR args[])
 
 TCHAR* CTegraRcmGUIDlg::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 {
+	
+	// Get current directory
+	TCHAR szPath[_MAX_PATH];
+	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
+	CString csPathf(szPath);
+	int nIndex = csPathf.ReverseFind(_T('\\'));
+	if (nIndex > 0) csPath = csPathf.Left(nIndex);
+	else csPath.Empty();
+
+	csPath2 = csPath;
+	csPath2 += TEXT("\\");
+	csPath2 += relative_path;
+	return _tcsdup(csPath2);
+	/*
 	TCHAR szPath[MAX_PATH];
+
 	if (SUCCEEDED(SHGetFolderPath(NULL, dwFlags, NULL, SHGFP_TYPE_CURRENT, szPath)))
 	{
 		if (dwFlags == CSIDL_APPDATA)   PathAppend(szPath, _T("\\TegraRcmGUI"));
@@ -699,5 +744,6 @@ TCHAR* CTegraRcmGUIDlg::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 		return _tcsdup(szPath);
 	}
 	return _T("");
+	*/
 }
 
