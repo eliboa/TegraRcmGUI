@@ -6,13 +6,15 @@ This application is just a GUI for the command line program ["TegraRcmSmash"](ht
 Please, *DO NOT* report issue on TegraRcmSmash GitHub if you're using this application => Report issue [here](https://github.com/eliboa/TegraRcmGUI/issues) *FIRST*.
 
 ## Features
-- Inject payloads, such as CFW loader
-- Run Linux on your switch
+- Inject payloads, such as CFW loaders
+- Manage favorites ***!new v2.0!***
+- Run Linux on your switch 
 - Mount SD as USB mass storage (hard reboot needed after unmounting device, hold power button down for 15sec)
 - Auto inject option : automatically inject payload after selection or/and when the Switch is plugged in RCM mode (does not apply at startup)
+- Minimize app to tray & tray icon context menu ***!new v2.0!***
 - Install APX device driver (if needed)
 
-![Png](http://splatoon.eu/tuto_switch/TegraRcmGUI_v1.4.png)
+![Png](http://tegrarcmgui.gq/TegraRcmGUI_v2.0.png)
 
 ## Download
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases) (Windows)
