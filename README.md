@@ -1,5 +1,5 @@
 # TegraRcmGUI
-A simple C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto). 
+A simple C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto). (payload loader for Nintendo Switch)
 
 ## Important notice
 This application is just a GUI for the command line program ["TegraRcmSmash"](https://github.com/rajkosto/TegraRcmSmash) (all credits goes to @rajkosto & @ktemkin).
