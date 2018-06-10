@@ -18,5 +18,7 @@ public:
 	TegraRcmSmash();
 	~TegraRcmSmash();
 	static int RcmStatus();
+	static int Test();
+
 };
 

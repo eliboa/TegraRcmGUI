@@ -225,6 +225,98 @@ TegraRcmSmash::~TegraRcmSmash()
 {
 }
 
+int TegraRcmSmash::Test()
+{
+	KLST_DEVINFO_HANDLE deviceInfo = nullptr;
+
+	KLST_HANDLE deviceList = nullptr;
+	if (!LstK_Init(&deviceList, KLST_FLAG_NONE))
+	{
+		const auto errorCode = GetLastError();
+		// Win32 error trying to list USB devices
+		return -6;
+	}
+	auto lstKgrd = MakeScopeGuard([&deviceList]()
+	{
+		if (deviceList != nullptr)
+		{
+			LstK_Free(deviceList);
+			deviceList = nullptr;
+		}
+	});
+
+	// Get the number of devices contained in the device list.
+	UINT deviceCount = 0;
+	LstK_Count(deviceList, &deviceCount);
+
+	if (deviceCount == 0 || LstK_FindByVidPid(deviceList, deviceVid, devicePid, &deviceInfo) == FALSE)
+	{
+		// No device found in RCM Mode
+		return -5;
+	}
+
+	if (deviceInfo != nullptr)
+	{
+		if (deviceInfo->DriverID != KUSB_DRVID_LIBUSBK)
+		{
+			/*
+			Wrong driver => need to install libusbK driver
+			*/
+			return -4;
+		}
+
+		KUSB_DRIVER_API Usb;
+		LibK_LoadDriverAPI(&Usb, deviceInfo->DriverID);
+
+		// Initialize the device
+		KUSB_HANDLE handle = nullptr;
+		if (!Usb.Init(&handle, deviceInfo))
+		{
+			const auto errorCode = GetLastError();
+			// Failed to handle device
+			return -3;
+		}
+
+		RCMDeviceHacker rcmDev(Usb, handle); handle = nullptr;
+
+		libusbk::version_t usbkVersion;
+		memset(&usbkVersion, 0, sizeof(usbkVersion));
+		const auto versRetVal = rcmDev.getDriverVersion(usbkVersion);
+		if (versRetVal <= 0)
+		{
+			// Failed to get USB driver version
+			return -2;
+		}
+		else if (usbkVersion.major != 3 || usbkVersion.minor != 0 || usbkVersion.micro != 7)
+		{
+
+			// Wrong USB driver version
+			return -1;
+		}
+
+		ByteVector readBuffer(32768, 0);
+		for (int i = 0; i <= 100; i++)
+		{
+			int bytesRead = 0;
+			if ((bytesRead = rcmDev.read(&readBuffer[0], readBuffer.size())) > 0)
+			{
+				static const char READY_INDICATOR[] = "READY.\n";
+				if (bytesRead == array_countof(READY_INDICATOR) - 1 && memcmp(&readBuffer[0], READY_INDICATOR, array_countof(READY_INDICATOR) - 1) == 0)
+				{
+					int bytesSent = rcmDev.write((const u8*)"RECV", strlen("RECV"));
+					if (bytesSent == strlen("RECV"))
+					{
+						return 0;
+					}
+				}
+			}
+		}
+
+	}
+
+	return 0;
+}
+
 
 int TegraRcmSmash::RcmStatus()
 {
@@ -294,8 +386,7 @@ int TegraRcmSmash::RcmStatus()
 			// Wrong USB driver version
 			return -1;
 		}
-	}
-
+	}	
 	return 0;
 
 }

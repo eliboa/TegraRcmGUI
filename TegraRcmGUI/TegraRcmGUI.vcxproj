@@ -202,12 +202,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DialogTab01.h" />
+    <ClInclude Include="DialogTab02.h" />
+    <ClInclude Include="DialogTab03.h" />
     <ClInclude Include="libusbk_int.h" />
+    <ClInclude Include="MyTabCtrl.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="res\BitmapPicture.h" />
     <ClInclude Include="ScopeGuard.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TegraRcm.h" />
     <ClInclude Include="TegraRcmGUI.h" />
     <ClInclude Include="TegraRcmGUIDlg.h" />
     <ClInclude Include="TegraRcmSmash.h" />
@@ -216,6 +221,10 @@
     <ClInclude Include="WinHandle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DialogTab01.cpp" />
+    <ClCompile Include="DialogTab02.cpp" />
+    <ClCompile Include="DialogTab03.cpp" />
+    <ClCompile Include="MyTabCtrl.cpp" />
     <ClCompile Include="res\BitmapPicture.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -223,6 +232,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TegraRcm.cpp" />
     <ClCompile Include="TegraRcmGUI.cpp" />
     <ClCompile Include="TegraRcmGUIDlg.cpp" />
     <ClCompile Include="TegraRcmSmash.cpp" />
@@ -237,16 +247,25 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\..\Visual Studio 2015\Projects\TegraRcmGUI\TegraRcmGUI\res\TegraRcmGUI.ico" />
+    <Image Include="res\add.ico" />
     <Image Include="res\bitmap2.bmp" />
+    <Image Include="res\browse.ico" />
+    <Image Include="res\delete.ico" />
     <Image Include="res\driver_ko.bmp" />
     <Image Include="res\error.bmp" />
+    <Image Include="res\icon1.ico" />
     <Image Include="res\init_log.bmp" />
     <Image Include="res\init_logo.bmp" />
+    <Image Include="res\linux_icon.ico" />
     <Image Include="res\loaded.bmp" />
     <Image Include="res\loading.bmp" />
     <Image Include="res\rcm_detected.bmp" />
     <Image Include="res\rcm_undetected.bmp" />
+    <Image Include="res\status.ico" />
     <Image Include="res\TegraRcmGUI.ico" />
+    <Image Include="res\tray_ico_connected.ico" />
+    <Image Include="res\tray_ico_not_connected.ico" />
+    <Image Include="res\usb_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
