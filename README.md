@@ -24,4 +24,3 @@ Please, *DO NOT* report issue on TegraRcmSmash GitHub if you're using this appli
 - [Rajkosto](https://github.com/rajkosto) / TegraRcmSmash (Fusée Launcher reimplementation for Windows), momeloader, SD tool
 - [fail0verflow](https://github.com/fail0verflow) / ShofEL2 (Boot stack for no-modification, universal code execution and Linux on the Nintendo Switch)
 
-[![Analytics](https://ga-beacon.appspot.com/UA-121074701-2/TegraRcmGUI/readme)](https://github.com/igrigorik/ga-beacon)
