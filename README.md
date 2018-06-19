@@ -3,7 +3,7 @@ A simple C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) 
 
 ## Important notice
 This application is just a GUI for the command line program ["TegraRcmSmash"](https://github.com/rajkosto/TegraRcmSmash) (all credits goes to @rajkosto & @ktemkin).
-Please, *DO NOT* report issue on TegraRcmSmash's repo if you're using this application => Report issue [here](https://github.com/eliboa/TegraRcmGUI/issues) *FIRST*.
+Please, *DO NOT* report issue on TegraRcmSmash's repo, report issue [here](https://github.com/eliboa/TegraRcmGUI/issues) *FIRST*.
 
 ## Features
 - Inject payloads, such as CFW loaders
