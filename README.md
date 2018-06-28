@@ -14,7 +14,7 @@ Please, *DO NOT* report issue on TegraRcmSmash's repo, report issue [here](https
 - Minimize app to tray & tray icon context menu ***!new v2.0!***
 - Install APX device driver (if needed)
 
-![Png](http://tegrarcmgui.gq/TegraRcmGUI_v2.0.png)
+![Png](http://splatoon.eu/tuto_switch/TegraRcmGUI_v2.1.png)
 
 ## Download
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases) (Windows)
