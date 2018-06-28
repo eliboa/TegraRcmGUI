@@ -106,6 +106,18 @@ public:
 	void BrowseCommand();
 	void LinuxCommand();
 	void MountCommand();
+	void InjectFavCommand(int i);
+	void InjectFav01Command();
+	void InjectFav02Command();
+	void InjectFav03Command();
+	void InjectFav04Command();
+	void InjectFav05Command();
+	void InjectFav06Command();
+	void InjectFav07Command();
+	void InjectFav08Command();
+	void InjectFav09Command();
+	void InjectFav10Command();
+
 	CTegraRcmGUIDlg *m_pMainWnd = this;
 private:
 	MyTabCtrl m_tbCtrl;

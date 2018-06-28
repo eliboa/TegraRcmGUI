@@ -55,14 +55,14 @@ CTegraRcmGUIDlg::CTegraRcmGUIDlg(CWnd* pParent /*=NULL*/)
 }
 void CTegraRcmGUIDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CDialog::DoDataExchange(pDX);	
 	DDX_Control(pDX, RCM_PIC_1, RCM_BITMAP1);
 	DDX_Control(pDX, RCM_PIC_2, RCM_BITMAP2);
 	DDX_Control(pDX, RCM_PIC_3, RCM_BITMAP3);
 	DDX_Control(pDX, RCM_PIC_4, RCM_BITMAP0);
 	DDX_Control(pDX, RCM_PIC_5, RCM_BITMAP4);
 	DDX_Control(pDX, RCM_PIC_6, RCM_BITMAP5);
-	DDX_Control(pDX, RCM_PIC_7, RCM_BITMAP6);
+	DDX_Control(pDX, RCM_PIC_7, RCM_BITMAP6);	
 	DDX_Control(pDX, IDC_TAB_CONTROL, m_tbCtrl);
 }
 BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
@@ -82,6 +82,16 @@ BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
 	ON_COMMAND(SWM_BROWSE, BrowseCommand)
 	ON_COMMAND(SWM_LINUX, LinuxCommand)
 	ON_COMMAND(SWM_MOUNT, MountCommand)
+	ON_COMMAND(SWM_FAV01, InjectFav01Command)
+	ON_COMMAND(SWM_FAV02, InjectFav02Command)
+	ON_COMMAND(SWM_FAV03, InjectFav03Command)
+	ON_COMMAND(SWM_FAV04, InjectFav04Command)
+	ON_COMMAND(SWM_FAV05, InjectFav05Command)
+	ON_COMMAND(SWM_FAV06, InjectFav06Command)
+	ON_COMMAND(SWM_FAV07, InjectFav07Command)
+	ON_COMMAND(SWM_FAV08, InjectFav08Command)
+	ON_COMMAND(SWM_FAV09, InjectFav09Command)
+	ON_COMMAND(SWM_FAV10, InjectFav10Command)
 END_MESSAGE_MAP()
 
 //
@@ -103,13 +113,34 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	else csPath.Empty();
 
 	// Initialize bitmap
-	RCM_BITMAP0.SetBitmap(INIT_LOGO);
-	RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED);
-	RCM_BITMAP2.SetBitmap(DRIVER_KO);
-	RCM_BITMAP3.SetBitmap(RCM_DETECTED);
-	RCM_BITMAP4.SetBitmap(LOADING);
-	RCM_BITMAP5.SetBitmap(LOADED);
-	RCM_BITMAP6.SetBitmap(LOAD_ERROR);
+
+
+
+	CRect rc;
+	AfxGetMainWnd()->GetWindowRect(rc);
+	int width = rc.Width();
+	
+	if (width < 400)
+	{
+		RCM_BITMAP0.SetBitmap(INIT_LOGO_2);
+		RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED_2);
+		RCM_BITMAP2.SetBitmap(DRIVER_KO_2);
+		RCM_BITMAP3.SetBitmap(RCM_DETECTED_2);
+		RCM_BITMAP4.SetBitmap(LOADING_2);
+		RCM_BITMAP5.SetBitmap(LOADED_2);
+		RCM_BITMAP6.SetBitmap(LOAD_ERROR_2);
+	}
+	else
+	{
+		RCM_BITMAP0.SetBitmap(INIT_LOGO);
+		RCM_BITMAP1.SetBitmap(RCM_NOT_DETECTED);
+		RCM_BITMAP2.SetBitmap(DRIVER_KO);
+		RCM_BITMAP3.SetBitmap(RCM_DETECTED);
+		RCM_BITMAP4.SetBitmap(LOADING);
+		RCM_BITMAP5.SetBitmap(LOADED);
+		RCM_BITMAP6.SetBitmap(LOAD_ERROR);
+	}
+	
 
 	// Menu
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -161,9 +192,7 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	m_TegraRcm->SetTrayIconTipText(TEXT("TegraRcmGUI"));
 
 	// Start timer to check RCM status every second
-	CTegraRcmGUIDlg::StartTimer();
-
-	
+	CTegraRcmGUIDlg::StartTimer();	
 
 	return TRUE;
 }
@@ -194,6 +223,10 @@ HBRUSH CTegraRcmGUIDlg::OnCtlColor(CDC* pDC, CWnd *pWnd, UINT nCtlColor)
 			return (HBRUSH) CreateSolidBrush( WhiteRGB );
 		}
 		if (GetDlgItem(IDC_STATUS_BG)->GetSafeHwnd() == pWnd->GetSafeHwnd())
+		{
+			return (HBRUSH)CreateSolidBrush(WhiteRGB);
+		}
+		if (GetDlgItem(RCM_BITMAP)->GetSafeHwnd() == pWnd->GetSafeHwnd())
 		{
 			return (HBRUSH)CreateSolidBrush(WhiteRGB);
 		}
@@ -308,6 +341,27 @@ void CTegraRcmGUIDlg::MountCommand()
 	{
 		DialogTab02 *pt = (DialogTab02*)m_TegraRcm->m_Ctrltb2;
 		pt->OnBnClickedMountSd();
+	}
+}
+void CTegraRcmGUIDlg::InjectFav01Command() { InjectFavCommand(0); }
+void CTegraRcmGUIDlg::InjectFav02Command() { InjectFavCommand(1); }
+void CTegraRcmGUIDlg::InjectFav03Command() { InjectFavCommand(2); }
+void CTegraRcmGUIDlg::InjectFav04Command() { InjectFavCommand(3); }
+void CTegraRcmGUIDlg::InjectFav05Command() { InjectFavCommand(4); }
+void CTegraRcmGUIDlg::InjectFav06Command() { InjectFavCommand(5); }
+void CTegraRcmGUIDlg::InjectFav07Command() { InjectFavCommand(6); }
+void CTegraRcmGUIDlg::InjectFav08Command() { InjectFavCommand(7); }
+void CTegraRcmGUIDlg::InjectFav09Command() { InjectFavCommand(8); }
+void CTegraRcmGUIDlg::InjectFav10Command() { InjectFavCommand(9); }
+void CTegraRcmGUIDlg::InjectFavCommand(int i)
+{
+	if (m_TegraRcm != NULL)
+	{
+		DialogTab01 *pt = (DialogTab01*)m_TegraRcm->m_Ctrltb1;
+		CString fav = m_TegraRcm->Favorites.GetAt(i);
+		pt->GetDlgItem(PAYLOAD_PATH)->SetWindowTextW(fav);
+		pt->GetDlgItem(PAYLOAD_PATH)->GetFocus();
+		pt->InjectPayload();
 	}
 }
 

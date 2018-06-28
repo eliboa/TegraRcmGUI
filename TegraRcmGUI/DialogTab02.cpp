@@ -66,14 +66,17 @@ END_MESSAGE_MAP()
 BOOL DialogTab02::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	CRect rc;
 
 	CButton* pBtn = (CButton*)GetDlgItem(IDC_MOUNT_SD);
+	pBtn->GetWindowRect(rc);
+	int height = rc.Height() * 0.8;
 	pBtn->ModifyStyle(0, BS_ICON);
 	HICON hIcn = (HICON)LoadImage(
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(ID_UMSTOOL_ICON),
 		IMAGE_ICON,
-		32, 32, // use actual size
+		height, height, // use actual size
 		LR_DEFAULTCOLOR
 		);
 	pBtn->SetIcon(hIcn);
@@ -84,7 +87,7 @@ BOOL DialogTab02::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(ID_LINUX_ICON),
 		IMAGE_ICON,
-		32, 32, // use actual size
+		height, height, // use actual size
 		LR_DEFAULTCOLOR
 		);
 	pBtn->SetIcon(hIcn);

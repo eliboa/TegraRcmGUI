@@ -53,30 +53,38 @@ DialogTab01::~DialogTab01()
 BOOL DialogTab01::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	CRect rc;
 
 	string pfile = m_TegraRcm->GetPreset("PAYLOAD_FILE");
 	CString file(pfile.c_str());
 	this->GetDlgItem(PAYLOAD_PATH)->SetWindowTextW(file);
 
 	CButton* pBtn = (CButton*)GetDlgItem(IDC_BROWSE);
+	pBtn->GetWindowRect(rc);
+	int height = rc.Height() * 0.8;
 	pBtn->ModifyStyle(0, BS_ICON);
 	HICON hIcn = (HICON)LoadImage(
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(ID_BROWSE_ICON),
 		IMAGE_ICON,
-		24, 24, // use actual size
+		height, height, // use actual size
 		LR_DEFAULTCOLOR
 		);
 
 	pBtn->SetIcon(hIcn);
 
 	pBtn = (CButton*)GetDlgItem(ID_ADD_FAV);
+
+
+	pBtn->GetWindowRect(rc);
+	height = rc.Height() * 0.8;
+
 	pBtn->ModifyStyle(0, BS_ICON);
 	hIcn = (HICON)LoadImage(
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(ID_ADD_ICON),
 		IMAGE_ICON,
-		24, 24, // use actual size
+		height, height, // use actual size
 		LR_DEFAULTCOLOR
 		);
 	pBtn->SetIcon(hIcn);
@@ -87,12 +95,14 @@ BOOL DialogTab01::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(ID_DELETE_ICON),
 		IMAGE_ICON,
-		24, 24, // use actual size
+		height, height, // use actual size
 		LR_DEFAULTCOLOR
 		);
 	pBtn->SetIcon(hIcn);
 
 	PREVENT_AUTOINJECT = FALSE;
+
+	m_TegraRcm->AppendLog("Add favorites to listbox");
 	
 	for (int i = 0; i < m_TegraRcm->Favorites.GetCount(); i++)
 	{
@@ -106,6 +116,11 @@ BOOL DialogTab01::OnInitDialog()
 			csPath = m_TegraRcm->Favorites[i].Left(nIndex);
 			Item = csFilename + _T(" (") + csPath + _T(")");
 			pListBox->AddString(_tcsdup(Item));
+			
+			wstring wcsPath(csPath);
+			string scsPath(wcsPath.begin(), wcsPath.end());
+			m_TegraRcm->AppendLog("Add favorites to listbox");
+			m_TegraRcm->AppendLog(scsPath);
 		}		
 	}
 
@@ -258,12 +273,25 @@ void DialogTab01::OnBnClickedAddFav()
 	int nIndex = csPathf.ReverseFind(_T('\\'));
 	if (nIndex > 0) csFilename = csPathf.Right(csPathf.GetLength() - nIndex - 1);
 	else return;
+
+	for (int i = 0; i < m_TegraRcm->Favorites.GetCount(); i++)
+	{
+		if (m_TegraRcm->Favorites[i] == csPathf)
+		{
+			m_TegraRcm->SendUserMessage("Favorite already exists", INVALID);
+			return;
+		}
+	}
+
 	csPath = csPathf.Left(nIndex);
 	Item = csFilename + _T(" (") + csPath + _T(")");
 	pListBox->AddString(_tcsdup(Item));
 	m_ListBox.Add(csPathf);
 	m_TegraRcm->Favorites.Add(csPathf);
 	m_TegraRcm->SaveFavorites();
+
+	m_TegraRcm->SendUserMessage("Favorite added", VALID);
+	return;
 }
 
 
@@ -277,7 +305,9 @@ void DialogTab01::OnBnClickedDelFav()
 		pListBox->DeleteString(i);
 		m_TegraRcm->Favorites.RemoveAt(i);
 		m_TegraRcm->SaveFavorites();
+		m_TegraRcm->SendUserMessage("Favorite removed", VALID);
 	}
+	return;
 }
 
 

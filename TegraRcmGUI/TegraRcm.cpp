@@ -141,6 +141,83 @@ void TegraRcm::ShowContextMenu(HWND hWnd)
 	{
 		if (m_RC == 0)
 		{
+
+			HMENU hSubmenu = CreatePopupMenu();
+			UINT uID = 0;
+
+			for (int i = 0; i < Favorites.GetCount(); i++)
+			{
+				if (i < 9)
+				{
+					uID++;
+					int swm;
+					switch (i)
+					{
+						case 0:
+							swm = SWM_FAV01;
+							break;
+						case 1:
+							swm = SWM_FAV02;
+							break;
+						case 2:
+							swm = SWM_FAV03;
+							break;
+						case 3:
+							swm = SWM_FAV04;
+							break;
+						case 4:
+							swm = SWM_FAV05;
+							break;
+						case 5:
+							swm = SWM_FAV06;
+							break;
+						case 6:
+							swm = SWM_FAV07;
+							break;
+						case 7:
+							swm = SWM_FAV08;
+							break;
+						case 8:
+							swm = SWM_FAV09;
+							break;
+						case 9:
+							swm = SWM_FAV10;
+							break;
+						default:
+							break;
+					}
+
+					int nIndex = Favorites[i].ReverseFind(_T('\\'));
+					if (nIndex > 0)
+					{
+
+						CString csFilename, csPath, Item;
+						csFilename = Favorites[i].Right(Favorites[i].GetLength() - nIndex - 1);
+						csPath = Favorites[i].Left(nIndex);
+						if (csPath.GetLength() > 30)
+						{
+							csPath = csPath.Left(30);
+							Item = csFilename + _T(" (") + csPath + _T("...)");
+						}
+						else
+						{
+							Item = csFilename + _T(" (") + csPath + _T(")");
+						}
+						InsertMenu(hSubmenu, -1, MF_BYPOSITION, swm, Item);
+					}
+					else
+					{
+						InsertMenu(hSubmenu, -1, MF_BYPOSITION, swm, Favorites[i]);
+					}
+				}
+			}
+			
+			MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
+			mii.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_ID;
+			mii.wID = uID;
+			mii.hSubMenu = hSubmenu;
+			mii.dwTypeData = _T("Favorites");
+
 			CString csPathf, csFilename, payload;
 			m_Ctrltb1->GetDlgItem(PAYLOAD_PATH)->GetWindowTextW(csPathf);
 			int nIndex = csPathf.ReverseFind(_T('\\'));
@@ -150,10 +227,13 @@ void TegraRcm::ShowContextMenu(HWND hWnd)
 				payload = _T("Inject ") + csFilename;
 				InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_INJECT, payload);
 			}
+			//InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_BROWSE, _T("Browse..."));
+			InsertMenuItem(hMenu, -1, TRUE, &mii);
+			InsertMenu(hMenu, -1, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 			InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_MOUNT, _T("Mount SD"));
-			InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_LINUX, _T("Linux"));
-			InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_BROWSE, _T("Browse..."));
+			InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_LINUX, _T("Linux"));			
 		}
+		InsertMenu(hMenu, -1, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 		if (IsWindowVisible(hWnd))
 			InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_HIDE, _T("Hide"));
 		else
@@ -277,17 +357,31 @@ void TegraRcm::SetPreset(string param, string value)
 }
 void TegraRcm::GetFavorites()
 {	
+	
 	Favorites.RemoveAll();
 	TCHAR *rfile = GetAbsolutePath(TEXT("favorites.conf"), CSIDL_APPDATA);
 	CT2A rfile_c(rfile, CP_UTF8);
 	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
 	string readout;
+	AppendLog("Reading favorites.conf");
+	wstring wfilename(rfile);
+	string filename(wfilename.begin(), wfilename.end());
+	AppendLog(filename);
+
 	ifstream readFile(rfile_c);
 	if (readFile.is_open()) {
+		AppendLog("Reading values from favorites.conf");
 		while (getline(readFile, readout)) {
 			CString fav(readout.c_str(), readout.length());
+			wstring wfav = fav;
+			string sfav(wfav.begin(), wfav.end());
+			AppendLog("Append new favorite : ");
+			AppendLog(sfav);
 			Favorites.Add(fav);
 		}
+	}
+	else {
+		AppendLog("Error reading favorites.conf");
 	}
 }
 void TegraRcm::AddFavorite(CString value)
@@ -316,6 +410,11 @@ void TegraRcm::SaveFavorites()
 //
 void TegraRcm::AppendLog(string message)
 {
+
+	// DISABLED
+	return;
+
+
 	// Get time
 	char str[32];
 	struct tm time_info;
@@ -416,6 +515,7 @@ BOOL TegraRcm::LookForAPXDevice()
 
 void TegraRcm::BitmapDisplay(int IMG)
 {
+	
 	// Init & bitmap pointers
 	CStatic*pRcm_not_detected = (CStatic*)AfxGetMainWnd()->GetDlgItem(RCM_PIC_1);
 	CStatic*pDriverKO = (CStatic*)AfxGetMainWnd()->GetDlgItem(RCM_PIC_2);
@@ -508,8 +608,8 @@ void TegraRcm::LookUp()
 	if (rc != m_RC)
 	{
 		m_RC = rc;
-		CStatic*pCtrl0 = (CStatic*) m_Parent->GetDlgItem(RCM_PIC_4);
-		pCtrl0->ShowWindow(SW_HIDE);
+		//CStatic*pCtrl0 = (CStatic*) m_Parent->GetDlgItem(RCM_PIC_4);
+		//pCtrl0->ShowWindow(SW_HIDE);
 
 		// Status changed to "RCM Detected"
 		if (rc == 0)
@@ -682,8 +782,8 @@ TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 	csPath2 += TEXT("\\");
 	csPath2 += relative_path;
 	return _tcsdup(csPath2);
-
 	*/
+	
 	// USE THIS INSTEAD TO BUILD FOR MSI PACKAGER
 
 	TCHAR szPath[MAX_PATH];
