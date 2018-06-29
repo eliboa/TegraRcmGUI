@@ -303,10 +303,10 @@ LRESULT TegraRcm::OnTrayIconEvent(UINT wParam, LPARAM lParam)
 string TegraRcm::GetPreset(string param)
 {
 	TCHAR *rfile = GetAbsolutePath(TEXT("presets.conf"), CSIDL_APPDATA);
-	CT2A rfile_c(rfile, CP_UTF8);
-	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
+	//CT2A rfile_c(rfile, CP_UTF8);
+	//TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
 
-	ifstream readFile(rfile_c);
+	ifstream readFile(rfile);
 	string readout;
 	string search = param + "=";
 	std::string value = "";
@@ -326,14 +326,9 @@ void TegraRcm::SetPreset(string param, string value)
 {
 	TCHAR *rfile = GetAbsolutePath(TEXT("presets.conf"), CSIDL_APPDATA);
 	TCHAR *wfile = GetAbsolutePath(TEXT("presets.conf.tmp"), CSIDL_APPDATA);
-	CT2A rfile_c(rfile, CP_UTF8);
-	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
-	CT2A wfile_c(wfile, CP_UTF8);
-	TRACE(_T("UTF8: %S\n"), wfile_c.m_psz);
-
 	// Replace or create preset in file
-	ofstream outFile(wfile_c);
-	ifstream readFile(rfile_c);
+	ofstream outFile(wfile);
+	ifstream readFile(rfile);
 	string readout;
 	string search = param + "=";
 	string replace = search + value + "\n";
@@ -352,23 +347,21 @@ void TegraRcm::SetPreset(string param, string value)
 	}
 	outFile.close();
 	readFile.close();
-	remove(rfile_c);
-	rename(wfile_c, rfile_c);
+	remove(CT2A(rfile));
+	rename(CT2A(wfile), CT2A(rfile));
 }
 void TegraRcm::GetFavorites()
 {	
 	
 	Favorites.RemoveAll();
 	TCHAR *rfile = GetAbsolutePath(TEXT("favorites.conf"), CSIDL_APPDATA);
-	CT2A rfile_c(rfile, CP_UTF8);
-	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
 	string readout;
 	AppendLog("Reading favorites.conf");
 	wstring wfilename(rfile);
 	string filename(wfilename.begin(), wfilename.end());
 	AppendLog(filename);
 
-	ifstream readFile(rfile_c);
+	ifstream readFile(rfile);
 	if (readFile.is_open()) {
 		AppendLog("Reading values from favorites.conf");
 		while (getline(readFile, readout)) {
@@ -397,9 +390,7 @@ void TegraRcm::AddFavorite(CString value)
 void TegraRcm::SaveFavorites()
 {
 	TCHAR *rfile = GetAbsolutePath(TEXT("favorites.conf"), CSIDL_APPDATA);
-	CT2A rfile_c(rfile, CP_UTF8);
-	TRACE(_T("UTF8: %S\n"), rfile_c.m_psz);
-	remove(rfile_c);
+	remove(CT2A(rfile));
 	for (int i = 0; i < Favorites.GetCount(); i++)
 	{
 		AddFavorite(Favorites[i]);
@@ -730,6 +721,10 @@ int TegraRcm::Smasher(TCHAR args[])
 			{
 				rc = exit_code;
 			}
+			else
+			{
+				rc = -52;
+			}
 		}
 		else
 		{
@@ -768,7 +763,7 @@ ULONGLONG TegraRcm::GetDllVersion(LPCTSTR lpszDllName)
 }
 TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 {
-	/*
+	
 	// Get current directory
 	CString csPath;
 	TCHAR szPath[_MAX_PATH];
@@ -782,8 +777,8 @@ TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 	csPath2 += TEXT("\\");
 	csPath2 += relative_path;
 	return _tcsdup(csPath2);
-	*/
 	
+	/*
 	// USE THIS INSTEAD TO BUILD FOR MSI PACKAGER
 
 	TCHAR szPath[MAX_PATH];
@@ -795,4 +790,5 @@ TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 	return _tcsdup(szPath);
 	}
 	return _T("");	
+	*/
 }
