@@ -40,7 +40,8 @@ public:
 	void BitmapDisplay(int IMG);
 	void LookUp();
 	int Smasher(TCHAR args[]);
-	
+	char* GetRelativeFilename(char *currentDirectory, char *absoluteFilename);
+
 	BOOL CmdShow = TRUE;
 	// Notify Icon
 	NOTIFYICONDATA m_NID;

@@ -107,21 +107,25 @@ BOOL DialogTab01::OnInitDialog()
 	for (int i = 0; i < m_TegraRcm->Favorites.GetCount(); i++)
 	{
 		CListBox*pListBox = (CListBox*)GetDlgItem(IDC_LIST1);		
-
-		int nIndex = m_TegraRcm->Favorites[i].ReverseFind(_T('\\'));
+		CString fav = m_TegraRcm->Favorites[i];
+		int nIndex = fav.ReverseFind(_T('\\'));
+		CString csFilename, csPath, Item;
 		if (nIndex > 0)
 		{
-			CString csFilename, csPath, Item;
-			csFilename = m_TegraRcm->Favorites[i].Right(m_TegraRcm->Favorites[i].GetLength() - nIndex - 1);
-			csPath = m_TegraRcm->Favorites[i].Left(nIndex);
+			csFilename = fav.Right(fav.GetLength() - nIndex - 1);
+			csPath = fav.Left(nIndex);
 			Item = csFilename + _T(" (") + csPath + _T(")");
-			pListBox->AddString(_tcsdup(Item));
+		}
+		else
+		{
+			Item = fav;
+		}
+		pListBox->AddString(_tcsdup(Item));
 			
-			wstring wcsPath(csPath);
-			string scsPath(wcsPath.begin(), wcsPath.end());
-			m_TegraRcm->AppendLog("Add favorites to listbox");
-			m_TegraRcm->AppendLog(scsPath);
-		}		
+		wstring wcsPath(csPath);
+		string scsPath(wcsPath.begin(), wcsPath.end());
+		m_TegraRcm->AppendLog("Add favorites to listbox");
+		m_TegraRcm->AppendLog(scsPath);		
 	}
 
 	CFont* pFont = GetFont();
