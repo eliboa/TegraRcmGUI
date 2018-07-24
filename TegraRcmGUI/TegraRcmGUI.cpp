@@ -78,7 +78,10 @@ BOOL CTegraRcmGUIApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
-
+	
+	// Get command line args
+	CCustomCommandLineInfo oInfo;
+	ParseCommandLine(oInfo);
 
 	AfxEnableControlContainer();
 
@@ -93,12 +96,14 @@ BOOL CTegraRcmGUIApp::InitInstance()
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
 	CTegraRcmGUIDlg dlg;
+	if (oInfo.IsAutostart()) {
+		dlg.AUTOSTART = TRUE;
+	}
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
+		// TODO
 	}
 	else if (nResponse == IDCANCEL)
 	{
@@ -122,4 +127,3 @@ int CTegraRcmGUIApp::Run()
 	int rc = 0;
 	return 0;
 }
-

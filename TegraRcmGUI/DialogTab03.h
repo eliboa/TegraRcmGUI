@@ -30,4 +30,6 @@ public:
 	afx_msg void OnClickedAutoInject();
 	afx_msg void OnClickedMinToTray();
 	afx_msg void OnBnClickedInstallDriver();
+	afx_msg void OnBnClickedWinstart();
+
 };

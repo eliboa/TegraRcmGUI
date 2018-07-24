@@ -72,6 +72,25 @@ BOOL DialogTab03::OnInitDialog()
 		checkbox->SetCheck(BST_CHECKED);
 	}
 
+	HKEY hKey;
+	const std::string key = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+	const std::string subkey = "TegraRcmGUI";
+
+	// Open Run Registry location 
+	LONG lnRes = RegOpenKeyExA(HKEY_CURRENT_USER,
+		key.c_str(), 0, KEY_READ, &hKey);
+
+	if (ERROR_SUCCESS == lnRes)
+	{
+		lnRes = RegQueryValueExA(hKey, subkey.c_str(), NULL, NULL, NULL, NULL);
+		if (lnRes != ERROR_FILE_NOT_FOUND)
+		{
+			CMFCButton*checkbox = (CMFCButton*)GetDlgItem(RUN_WINSTART);
+			checkbox->SetCheck(BST_CHECKED);
+		}
+	}
+
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -80,6 +99,7 @@ BEGIN_MESSAGE_MAP(DialogTab03, CDialogEx)
 	ON_BN_CLICKED(AUTO_INJECT, &DialogTab03::OnClickedAutoInject)
 	ON_BN_CLICKED(MIN_TO_TRAY, &DialogTab03::OnClickedMinToTray)
 	ON_BN_CLICKED(ID_INSTALL_DRIVER, &DialogTab03::OnBnClickedInstallDriver)
+	ON_BN_CLICKED(RUN_WINSTART, &DialogTab03::OnBnClickedWinstart)
 END_MESSAGE_MAP()
 
 
@@ -131,3 +151,63 @@ void DialogTab03::OnBnClickedInstallDriver()
 	m_TegraRcm->InstallDriver();
 }
 
+
+
+void DialogTab03::OnBnClickedWinstart()
+{
+	// Init
+	HKEY hKey;
+	const std::string key = "TegraRcmGUI";
+	std::vector<char> buffer;
+
+	// Get checkbox value (checked, unchecked)
+	CButton *m_ctlCheck = (CButton*)GetDlgItem(RUN_WINSTART);
+	BOOL IsCheckChecked = (m_ctlCheck->GetCheck() == 1) ? true : false;
+
+	// Get application absolute path
+	TCHAR szPath[_MAX_PATH];
+	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
+	// Convert path to ANSI string
+	int size = WideCharToMultiByte(CP_UTF8, 0, szPath, -1, NULL, 0, NULL, NULL);
+	if (size > 0) {
+		buffer.resize(size);
+		WideCharToMultiByte(CP_UTF8, 0, szPath, -1, (LPSTR)(&buffer[0]), buffer.size(), NULL, NULL);
+	}
+	std::string appPath(&buffer[0]);
+	std::string keyValue;
+	keyValue.append("\"");
+	keyValue.append(appPath);
+	keyValue.append("\" /autostart");
+	
+	// Open Run Registry location 
+	LONG lnRes = RegOpenKeyEx(HKEY_CURRENT_USER,
+		_T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"),
+		0L, KEY_WRITE,
+		&hKey);
+
+	if (ERROR_SUCCESS == lnRes)
+	{
+		if (IsCheckChecked)
+		{
+			// Set full application path with a keyname to registry
+			lnRes = RegSetValueExA(hKey,
+				key.c_str(),
+				0,
+				REG_SZ,
+				(LPBYTE)(keyValue.c_str()),
+				keyValue.size() + 1);
+		}
+		else
+		{
+			lnRes = RegDeleteValueA(hKey, key.c_str());
+		}
+		if (ERROR_SUCCESS != lnRes)
+		{
+			AfxMessageBox(_T("Failed to set/unset at startup"));
+		}
+	}
+	else
+	{
+		AfxMessageBox(_T("Failed to access registry"));
+	}
+}

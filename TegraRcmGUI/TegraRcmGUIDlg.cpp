@@ -386,6 +386,13 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 	{
 		m_TegraRcm->LookUp();		
 	}
+
+	// After first initDialog, hide window if min2tray option is enabled
+	if (AUTOSTART)
+	{
+		if (m_TegraRcm->MIN_TO_TRAY_CURR) HideWindowCommand();
+		AUTOSTART = FALSE;
+	}
 }
 
 void CTegraRcmGUIDlg::OnEnChangePath()

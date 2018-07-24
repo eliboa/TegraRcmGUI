@@ -30,4 +30,24 @@ public:
 	DECLARE_MESSAGE_MAP()
 };
 
+class CCustomCommandLineInfo : public CCommandLineInfo
+{
+public:
+	CCustomCommandLineInfo()
+	{
+		m_bAutostart = FALSE;
+	}
+	BOOL m_bAutostart;      
+public:
+	BOOL IsAutostart() { return m_bAutostart; };
+
+	virtual void ParseParam(LPCTSTR pszParam, BOOL bFlag, BOOL bLast)
+	{
+		if (0 == wcscmp(pszParam, L"autostart"))
+		{
+			m_bAutostart = TRUE;
+		}
+	}
+};
+
 extern CTegraRcmGUIApp theApp;
