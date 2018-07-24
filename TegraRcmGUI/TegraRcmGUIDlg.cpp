@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
 	ON_COMMAND(SWM_FAV08, InjectFav08Command)
 	ON_COMMAND(SWM_FAV09, InjectFav09Command)
 	ON_COMMAND(SWM_FAV10, InjectFav10Command)
+	ON_COMMAND(SWM_AUTOINJECT, AutoInjectCommand)
 END_MESSAGE_MAP()
 
 //
@@ -362,6 +363,32 @@ void CTegraRcmGUIDlg::InjectFavCommand(int i)
 		pt->GetDlgItem(PAYLOAD_PATH)->SetWindowTextW(fav);
 		pt->GetDlgItem(PAYLOAD_PATH)->GetFocus();
 		pt->InjectPayload();
+	}
+}
+
+void CTegraRcmGUIDlg::AutoInjectCommand()
+{
+	if (m_TegraRcm != NULL)
+	{
+		DialogTab03 *pt = (DialogTab03*)m_TegraRcm->m_Ctrltb3;
+		if (m_TegraRcm->AUTOINJECT_CURR)
+		{
+			m_TegraRcm->AUTOINJECT_CURR = FALSE;
+			m_TegraRcm->SetPreset("AUTO_INJECT", "FALSE");
+			m_TegraRcm->DELAY_AUTOINJECT = FALSE;
+			CButton *m_ctlCheck = (CButton*)pt->GetDlgItem(AUTO_INJECT);
+			m_ctlCheck->SetCheck(BST_UNCHECKED);
+		}
+		else
+		{
+			m_TegraRcm->AUTOINJECT_CURR = TRUE;
+			m_TegraRcm->SetPreset("AUTO_INJECT", "TRUE");
+			m_TegraRcm->DELAY_AUTOINJECT = TRUE;
+			CButton *m_ctlCheck = (CButton*)pt->GetDlgItem(AUTO_INJECT);
+			m_ctlCheck->SetCheck(BST_CHECKED);
+		}
+		AfxGetMainWnd()->UpdateWindow();
+		pt->OnClickedAutoInject();
 	}
 }
 

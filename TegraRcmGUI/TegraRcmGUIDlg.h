@@ -26,7 +26,7 @@
 #include "TegraRcm.h"
 #include "DialogTab01.h"
 #include "DialogTab02.h"
-
+#include "DialogTab03.h"
 
 
 #pragma comment (lib, "setupapi.lib")
@@ -118,6 +118,7 @@ public:
 	void InjectFav08Command();
 	void InjectFav09Command();
 	void InjectFav10Command();
+	void AutoInjectCommand();
 
 	CTegraRcmGUIDlg *m_pMainWnd = this;
 private:

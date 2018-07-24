@@ -139,6 +139,12 @@ void TegraRcm::ShowContextMenu(HWND hWnd)
 	HMENU hMenu = CreatePopupMenu();
 	if (hMenu)
 	{
+
+		CString autoinjectLb;
+		if (AUTOINJECT_CURR) autoinjectLb = _T("Auto inject (On)");
+		else autoinjectLb = _T("Auto inject (Off)");
+		InsertMenu(hMenu, -1, MF_BYPOSITION, SWM_AUTOINJECT, autoinjectLb);
+
 		if (m_RC == 0)
 		{
 
@@ -219,6 +225,7 @@ void TegraRcm::ShowContextMenu(HWND hWnd)
 			mii.dwTypeData = _T("Favorites");
 
 			CString csPathf, csFilename, payload;
+
 			m_Ctrltb1->GetDlgItem(PAYLOAD_PATH)->GetWindowTextW(csPathf);
 			int nIndex = csPathf.ReverseFind(_T('\\'));
 			if (nIndex > 0)
