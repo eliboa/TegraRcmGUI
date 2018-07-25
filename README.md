@@ -11,10 +11,10 @@ A C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [raj
 - Option - Run app at Windows startup 
 - Install APX device driver (if needed)
 
-![Png](http://splatoon.eu/tuto_switch/TegraRcmGUI_v2.1.png)
+![Png](http://tegrarcmgui.gq/TegraRcmGUI_v2.2.png)
 
 ## Download
-[Latest release](http://tegrarcmgui.gq/TegraRcmGUI_v2.2.png) (Windows)
+[Latest release](https://github.com/eliboa/TegraRcmGUI/releases/latest) (Windows)
 
 ## Important notice
 This UI is **Windows-only**. 
