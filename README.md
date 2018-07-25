@@ -14,13 +14,14 @@ A C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [raj
 ![Png](http://splatoon.eu/tuto_switch/TegraRcmGUI_v2.1.png)
 
 ## Download
-[Latest release](https://github.com/eliboa/TegraRcmGUI/releases) (Windows)
+[Latest release](http://tegrarcmgui.gq/TegraRcmGUI_v2.2.png) (Windows)
 
 ## Important notice
-This UI is **Windows-only**. For non Windows systems, you can use :
+This UI is **Windows-only**. 
+For other platforms, you can use :
 - [Fusée Launcher](https://github.com/Cease-and-DeSwitch/fusee-launcher) (GNU/Linux)
 - [NXBoot](https://mologie.github.io/nxboot/) (OS X, iOS)
-- [NXLoader](https://github.com/DavidBuchanan314/NXLoader/releases) (Android)
+- [NXLoader](https://github.com/DavidBuchanan314/NXLoader) (Android)
 - [Web Fusée Launcher](https://fusee-gelee.firebaseapp.com/) (Cross-platform, only works with Chrome)
 
 ## Issue / Suggestion
