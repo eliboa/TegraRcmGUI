@@ -1,5 +1,5 @@
 # TegraRcmGUI
-A C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto). (payload loader for Nintendo Switch)
+A C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (payload loader for Nintendo Switch)
 
 ## Features
 - Inject payloads (such as CFW bootloader, Nand/Key Dumper, etc)
@@ -18,12 +18,13 @@ A C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [raj
 
 ## Important notice
 This UI is **Windows-only**. For non Windows systems, you can use :
-- GNU/Linux : [Fusée Launcher](https://github.com/Cease-and-DeSwitch/fusee-launcher)
-- OS X & iOS : [NXBoot](https://mologie.github.io/nxboot/)
-- Android : [NXLoader](https://github.com/DavidBuchanan314/NXLoader/releases)
+- [Fusée Launcher](https://github.com/Cease-and-DeSwitch/fusee-launcher) (GNU/Linux)
+- [NXBoot](https://mologie.github.io/nxboot/) (OS X, iOS)
+- [NXLoader](https://github.com/DavidBuchanan314/NXLoader/releases) (Android)
+- [Web Fusée Launcher](https://fusee-gelee.firebaseapp.com/) (Cross-platform, only works with Chrome)
 
-## Issues / Suggestions
-Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to submit an issue or suggestion.
+## Issue / Suggestion
+Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report a bug or submit a suggestion.
 
 ## Credits
 - [Kate Temkin](https://github.com/ktemkin) / [Fusée Launcher](https://github.com/Cease-and-DeSwitch/fusee-launcher)
