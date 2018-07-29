@@ -1,11 +1,11 @@
 # TegraRcmGUI
-A C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (payload loader for Nintendo Switch)
+C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (payload loader for Nintendo Switch)
 
 ## Features
 - Inject payloads (such as CFW bootloader, Nand/Key Dumper, etc)
 - Manage favorites
 - Run Linux on your switch (ShofEL2)
-- Mount device as USB mass storage (hold power button down for 10sec to exit)
+- Mount device as USB mass storage (read/write from/to SD card only, hold power button down for 10sec to exit)
 - Option - "Auto inject" : automatically inject payload after selection or/and when the Switch is plugged in RCM mode (does not apply at startup)
 - Option - Minimize app to tray & tray icon's context menu 
 - Option - Run app at Windows startup 
