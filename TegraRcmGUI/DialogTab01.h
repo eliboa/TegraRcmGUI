@@ -2,6 +2,7 @@
 #include <string>
 #include "TegraRcmGUIDlg.h"
 #include "TegraRcm.h"
+#include "afxole.h"
 
 // DialogTab01 dialog
 
@@ -19,7 +20,7 @@ public:
 #endif
 	TCHAR* PAYLOAD_FILE;
 	BOOL PREVENT_AUTOINJECT = TRUE;
-	BOOL DELAY_AUTOINJECT = FALSE;
+	BOOL DELAY_AUTOINJECT = TRUE;
 	CArray <CString, CString> m_ListBox;
 	int m_SelectedItem = -1;
 	CFont m_BoldFont;
@@ -38,4 +39,5 @@ public:
 	afx_msg void OnDblclkList1();
 	afx_msg void OnLbnSelchangeList1();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	COleDropTarget FileDropTarget;
 };

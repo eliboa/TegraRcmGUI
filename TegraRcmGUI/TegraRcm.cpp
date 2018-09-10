@@ -453,7 +453,7 @@ void TegraRcm::AppendLog(string message)
 {
 
 	// DISABLED
-	return;
+	//return;
 
 
 	// Get time
@@ -608,7 +608,6 @@ void TegraRcm::BitmapDisplay(int IMG)
 //
 void TegraRcm::LookUp()
 {
-
 	// Exit when PAUSE_LKP_DEVICE flag is TRUE
 	if (PAUSE_LKP_DEVICE) return;
 
@@ -646,7 +645,7 @@ void TegraRcm::LookUp()
 	}
 
 	// On change RCM status
-	if (rc != m_RC)
+	if (rc != m_RC || m_RC == -99)
 	{
 		m_RC = rc;
 		//CStatic*pCtrl0 = (CStatic*) m_Parent->GetDlgItem(RCM_PIC_4);
@@ -661,7 +660,12 @@ void TegraRcm::LookUp()
 			m_Ctrltb1->GetDlgItem(PAYLOAD_PATH)->GetWindowTextW(file);
 
 			// Trigger auto inject if payload injection scheduled
-			if (!FIRST_LOOKUP && DELAY_AUTOINJECT && file.GetLength() > 0)
+			//if (!FIRST_LOOKUP && DELAY_AUTOINJECT && file.GetLength() > 0)
+			if (FIRST_LOOKUP) {
+				if(AUTOINJECT_CURR) DELAY_AUTOINJECT = TRUE;
+				else DELAY_AUTOINJECT = FALSE;
+			}
+			if (DELAY_AUTOINJECT && file.GetLength() > 0)
 			{
 
 				BitmapDisplay(LOADING);
@@ -763,18 +767,23 @@ int TegraRcm::Smasher(TCHAR args[])
 	int rc = -50;
 	if (NULL != ret)
 	{
+		AppendLog("Ret is not null");
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		DWORD exit_code;
 		if (FALSE != GetExitCodeProcess(pi.hProcess, &exit_code))
 		{
+			AppendLog("GetExitCodeProcess != FALSE");
 			if (STILL_ACTIVE != exit_code)
 			{
 				rc = exit_code;
+				AppendLog("Real exit code");
 			}
 			else
 			{
 				rc = -52;
+				AppendLog("RC = -52");
 			}
+
 		}
 		else
 		{
@@ -782,6 +791,9 @@ int TegraRcm::Smasher(TCHAR args[])
 		}
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
+	}
+	else {
+		AppendLog("Ret is null");
 	}
 	return rc;
 }
@@ -811,6 +823,75 @@ ULONGLONG TegraRcm::GetDllVersion(LPCTSTR lpszDllName)
 	}
 	return ullVersion;
 }
+
+void TegraRcm::KillRunningProcess(CString process) {
+
+	CString compare;
+	DWORD processID;
+	DWORD currentProcessID = GetCurrentProcessId();
+	bool procRunning = false;
+
+	HANDLE hProcessSnap;
+	PROCESSENTRY32 pe32;
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	if (hProcessSnap == INVALID_HANDLE_VALUE) {
+		procRunning = false;
+	}
+	else {
+		pe32.dwSize = sizeof(PROCESSENTRY32);
+		if (Process32First(hProcessSnap, &pe32)) { // Gets first running process
+			if (pe32.szExeFile == process) {
+				procRunning = true;
+			}
+			else {
+				// loop through all running processes looking for process
+				while (Process32Next(hProcessSnap, &pe32)) {
+					// Set to an AnsiString instead of Char[] to make compare easier
+					compare = pe32.szExeFile;
+					processID = pe32.th32ProcessID;
+					if (compare == process && processID != currentProcessID) {
+						// if found process is running, set to true and break from loop
+						procRunning = true;
+						HWND hProcess = find_main_window(processID);
+						SendMessage(hProcess, WM_CLOSE, 0, 0);
+						DWORD err = GetLastError();
+						int test = 1;
+						//break;
+					}
+				}
+			}
+			// clean the snapshot object
+			CloseHandle(hProcessSnap);
+		}
+	}
+}
+
+
+struct handle_data {
+	unsigned long process_id;
+	HWND window_handle;
+};
+BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam)
+{
+	handle_data& data = *(handle_data*)lParam;
+	unsigned long process_id = 0;
+	GetWindowThreadProcessId(handle, &process_id);
+	if (data.process_id != process_id)
+		return TRUE;
+	data.window_handle = handle;
+	return FALSE;
+}
+
+HWND TegraRcm::find_main_window(unsigned long process_id)
+{
+	handle_data data;
+	data.process_id = process_id;
+	data.window_handle = 0;
+	EnumWindows(enum_windows_callback, (LPARAM)&data);
+	return data.window_handle;
+}
+
 TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 {
 	

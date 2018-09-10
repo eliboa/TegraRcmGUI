@@ -1,7 +1,26 @@
 #pragma once
+//#define _WIN32_DCOM
+//#include <comdef.h>
+//#include <taskschd.h>
+//#pragma comment(lib, "taskschd.lib")
+//#pragma comment(lib, "comsupp.lib")
+
 #include <string>
 #include "TegraRcmGUIDlg.h"
 #include "TegraRcm.h"
+
+#include "stdafx.h"
+#include <Windows.h>
+#include <shlobj.h>
+#include <winnls.h>
+#include <shobjidl.h>
+#include <objbase.h>
+#include <objidl.h>
+#include <shlguid.h>
+#include <atlbase.h>
+#include <atlconv.h>
+
+
 
 // DialogTab03 dialog
 
@@ -31,5 +50,7 @@ public:
 	afx_msg void OnClickedMinToTray();
 	afx_msg void OnBnClickedInstallDriver();
 	afx_msg void OnBnClickedWinstart();
+	void CreateLink();
+	afx_msg void CleanRegestry();
 
 };

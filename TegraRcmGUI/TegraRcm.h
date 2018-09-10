@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <Strsafe.h>
 #include "afxcmn.h"
+#include <tlhelp32.h>
 #pragma comment (lib, "setupapi.lib")
 
 class TegraRcm
@@ -23,6 +24,7 @@ class TegraRcm
 public:
 	TegraRcm(CDialog* pParent = NULL);
 	~TegraRcm();
+	
 public:
 	void InitCtrltbDlgs(CDialog* pCtrltb1, CDialog* pCtrltb2, CDialog* pCtrltb3);
 	int GetRcmStatus();	
@@ -41,6 +43,10 @@ public:
 	void LookUp();
 	int Smasher(TCHAR args[]);
 	char* GetRelativeFilename(char *currentDirectory, char *absoluteFilename);
+	
+
+	void KillRunningProcess(CString process);
+	HWND find_main_window(unsigned long process_id);
 
 	BOOL CmdShow = TRUE;
 	// Notify Icon
@@ -58,7 +64,7 @@ public:
 
 	BOOL PAUSE_LKP_DEVICE = FALSE;
 	BOOL AUTOINJECT_CURR = FALSE;
-	BOOL DELAY_AUTOINJECT = FALSE;
+	BOOL DELAY_AUTOINJECT = TRUE;
 	BOOL WAITING_RECONNECT = FALSE;
 	BOOL ASK_FOR_DRIVER = FALSE;
 	BOOL MIN_TO_TRAY_CURR = FALSE;
