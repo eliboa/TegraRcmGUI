@@ -194,10 +194,19 @@ void DialogTab03::CleanRegestry() {
 		if (lnRes != ERROR_FILE_NOT_FOUND)
 		{
 			//Remove regestry value
-			lnRes = RegDeleteValueA(hKey, key.c_str());
+			lnRes = RegOpenKeyEx(HKEY_CURRENT_USER,
+				_T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"),
+				0L, KEY_WRITE,
+				&hKey);
 
-			// Create new shortcut
-			CreateLink();
+			if (lnRes != ERROR_FILE_NOT_FOUND)
+			{
+				//Remove regestry value
+				lnRes = RegDeleteValueA(hKey, subkey.c_str());
+
+				// Create new shortcut
+				CreateLink();
+			}
 		}
 	}
 }

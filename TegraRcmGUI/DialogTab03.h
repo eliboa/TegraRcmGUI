@@ -1,10 +1,4 @@
 #pragma once
-//#define _WIN32_DCOM
-//#include <comdef.h>
-//#include <taskschd.h>
-//#pragma comment(lib, "taskschd.lib")
-//#pragma comment(lib, "comsupp.lib")
-
 #include <string>
 #include "TegraRcmGUIDlg.h"
 #include "TegraRcm.h"
