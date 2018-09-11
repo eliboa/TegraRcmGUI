@@ -93,6 +93,7 @@ BEGIN_MESSAGE_MAP(CTegraRcmGUIDlg, CDialog)
 	ON_COMMAND(SWM_FAV09, InjectFav09Command)
 	ON_COMMAND(SWM_FAV10, InjectFav10Command)
 	ON_COMMAND(SWM_AUTOINJECT, AutoInjectCommand)
+	ON_MESSAGE(WM_QUERYENDSESSION, OnQueryEndSession)
 END_MESSAGE_MAP()
 
 //
@@ -109,14 +110,16 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	TCHAR szPath[_MAX_PATH];
 	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
 	CString csPathf(szPath);
+	CT2CA pszConvertedAnsiString(csPathf);
+	std::string strStd(pszConvertedAnsiString);
+	m_TegraRcm->AppendLog("Module filename is : ");
+	m_TegraRcm->AppendLog(strStd);
+
 	int nIndex = csPathf.ReverseFind(_T('\\'));
 	if (nIndex > 0) csPath = csPathf.Left(nIndex);
 	else csPath.Empty();
 
 	// Initialize bitmap
-
-
-
 	CRect rc;
 	AfxGetMainWnd()->GetWindowRect(rc);
 	int width = rc.Width();
@@ -165,6 +168,12 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	m_TegraRcm = new TegraRcm(this);
+
+	m_TegraRcm->AppendLog("new TegraRcm()");
+
+	// Kill other running process of app
+	m_TegraRcm->KillRunningProcess(TEXT("TegraRcmGUI.exe"));
+	
 	m_tbCtrl.InitDialogs(m_TegraRcm);
 	
 	TCITEM tcItem1;
@@ -422,7 +431,10 @@ void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
 	}
 }
 
-void CTegraRcmGUIDlg::OnEnChangePath()
+LRESULT CTegraRcmGUIDlg::OnQueryEndSession(WPARAM wParm, LPARAM lParm)
 {
-	int test = 1;
+	// This is not useful, exit is not needed in that case
+	m_TegraRcm->AppendLog("OnEndSession");
+	PostMessage(WM_QUIT);
+	return TRUE;
 }

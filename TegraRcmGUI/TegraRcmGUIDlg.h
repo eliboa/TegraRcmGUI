@@ -92,6 +92,7 @@ protected:
 	afx_msg void OnDestroy();
 	afx_msg LRESULT OnTrayIconEvent(UINT wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+	afx_msg LRESULT OnQueryEndSession(WPARAM wParm, LPARAM lParm);
 
 public:
 	void StartTimer();
@@ -99,7 +100,7 @@ public:
 	void OnTimer(UINT nIDEvent);
 	int STATUS;
 	afx_msg void BitmapDisplay(int IMG);
-	afx_msg void OnEnChangePath();
+	
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd *pWnd, UINT nCtlColor);
 	void ShowWindowCommand();
 	void HideWindowCommand();

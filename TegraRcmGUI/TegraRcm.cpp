@@ -453,7 +453,7 @@ void TegraRcm::AppendLog(string message)
 {
 
 	// DISABLED
-	//return;
+	return;
 
 
 	// Get time
@@ -761,13 +761,23 @@ int TegraRcm::Smasher(TCHAR args[])
 	si.cb = sizeof(STARTUPINFO);
 	si.dwFlags |= STARTF_USESTDHANDLES;
 	si.hStdInput = NULL;
-	TCHAR cmd[MAX_PATH] = TEXT(".\\TegraRcmSmash.exe ");
+
+	// This should fix RC-50 issue, ! At last.
+	TCHAR szPath[_MAX_PATH];
+	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
+	CString csPathf(szPath);
+	int nIndex = csPathf.ReverseFind(_T('\\'));
+	if (nIndex > 0) csPath = csPathf.Left(nIndex);
+	else csPath.Empty();
+	csPath.Append(TEXT(".\\TegraRcmSmash.exe "));
+	TCHAR cmd[MAX_PATH];
+	_tcscpy_s(cmd, csPath);	
 	lstrcat(cmd, args);
-	ret = CreateProcess(NULL, cmd, NULL, NULL, TRUE, flags, NULL, NULL, &si, &pi);
+	
+	ret = CreateProcess(NULL, cmd, NULL, NULL, FALSE, flags, NULL, NULL, &si, &pi);
 	int rc = -50;
 	if (NULL != ret)
 	{
-		AppendLog("Ret is not null");
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		DWORD exit_code;
 		if (FALSE != GetExitCodeProcess(pi.hProcess, &exit_code))
@@ -776,7 +786,6 @@ int TegraRcm::Smasher(TCHAR args[])
 			if (STILL_ACTIVE != exit_code)
 			{
 				rc = exit_code;
-				AppendLog("Real exit code");
 			}
 			else
 			{
@@ -793,7 +802,21 @@ int TegraRcm::Smasher(TCHAR args[])
 		CloseHandle(pi.hThread);
 	}
 	else {
-		AppendLog("Ret is null");
+		
+		int lastErrorCode = GetLastError();		
+		LPWSTR lpMsgBuf = NULL;
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+			NULL,
+			lastErrorCode,
+			0,
+			(LPWSTR)&lpMsgBuf,
+			0,
+			NULL);
+		std::string MyString = CW2A(lpMsgBuf);
+		std::string intStr = std::to_string(lastErrorCode);
+		AppendLog(intStr);
+		AppendLog(MyString);
+		
 	}
 	return rc;
 }
@@ -894,34 +917,39 @@ HWND TegraRcm::find_main_window(unsigned long process_id)
 
 TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 {
-	
-	// Get current directory
-	CString csPath;
-	TCHAR szPath[_MAX_PATH];
-	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
-	CString csPathf(szPath);
-	int nIndex = csPathf.ReverseFind(_T('\\'));
-	if (nIndex > 0) csPath = csPathf.Left(nIndex);
-	else csPath.Empty();
-	CString csPath2;
-	csPath2 = csPath;
-	csPath2 += TEXT("\\");
-	csPath2 += relative_path;
-	return _tcsdup(csPath2);
-	
-	/*
-	// USE THIS INSTEAD TO BUILD FOR MSI PACKAGER
+	//
+	//
+	BOOL PORTABLE = FALSE;
+	//
+	//
 
-	TCHAR szPath[MAX_PATH];
-
-	if (SUCCEEDED(SHGetFolderPath(NULL, dwFlags, NULL, SHGFP_TYPE_CURRENT, szPath)))
-	{
-	if (dwFlags == CSIDL_APPDATA)   PathAppend(szPath, _T("\\TegraRcmGUI"));
-	PathAppend(szPath, relative_path);
-	return _tcsdup(szPath);
+	if (PORTABLE) {
+		// Get current directory
+		CString csPath;
+		TCHAR szPath[_MAX_PATH];
+		VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
+		CString csPathf(szPath);
+		int nIndex = csPathf.ReverseFind(_T('\\'));
+		if (nIndex > 0) csPath = csPathf.Left(nIndex);
+		else csPath.Empty();
+		CString csPath2;
+		csPath2 = csPath;
+		csPath2 += TEXT("\\");
+		csPath2 += relative_path;
+		return _tcsdup(csPath2);
 	}
-	return _T("");	
-	*/
+	else
+	{
+		// USE THIS INSTEAD TO BUILD FOR MSI PACKAGER
+		TCHAR szPath[MAX_PATH];
+		if (SUCCEEDED(SHGetFolderPath(NULL, dwFlags, NULL, SHGFP_TYPE_CURRENT, szPath)))
+		{
+			if (dwFlags == CSIDL_APPDATA)   PathAppend(szPath, _T("\\TegraRcmGUI"));
+			PathAppend(szPath, relative_path);
+			return _tcsdup(szPath);
+		}
+		return _T("");
+	}
 }
 
 

@@ -163,9 +163,18 @@ void DialogTab03::CreateLink()
 			IPersistFile* ppf;
 
 			// Set the path to the shortcut target and add the description. 
+			//PathAppend(szPath, _T("\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\TegraRcmGUI.lnk"));
+			
 			psl->SetPath(szAppPath);
+			psl->SetArguments(_T("/autostart"));
 			psl->SetDescription(L"TegraRcmGUI");
 			psl->SetIconLocation(szAppPath, 0);
+
+			CString csPath, csPathf(szAppPath);
+			int nIndex = csPathf.ReverseFind(_T('\\'));
+			if (nIndex > 0) csPath = csPathf.Left(nIndex);
+			else csPath.Empty();
+			psl->SetWorkingDirectory(csPath);
 
 			hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
 			if (SUCCEEDED(hres)) {

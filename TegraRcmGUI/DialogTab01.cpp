@@ -142,7 +142,6 @@ BOOL DialogTab01::OnInitDialog()
 
 BEGIN_MESSAGE_MAP(DialogTab01, CDialog)
 	ON_BN_CLICKED(IDC_BROWSE, &DialogTab01::OnBnClickedBrowse)
-	ON_EN_CHANGE(PAYLOAD_PATH, &CTegraRcmGUIDlg::OnEnChangePath)
 	ON_BN_CLICKED(IDC_INJECT, &DialogTab01::InjectPayload)
 	ON_BN_CLICKED(ID_ADD_FAV, &DialogTab01::OnBnClickedAddFav)
 	ON_BN_CLICKED(ID_DEL_FAV, &DialogTab01::OnBnClickedDelFav)
