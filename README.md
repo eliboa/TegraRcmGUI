@@ -1,5 +1,5 @@
 # TegraRcmGUI
-C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (payload loader for Nintendo Switch)
+C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (Fusée Gelée exploit for Nintendo Switch)
 
 ## Features
 - Inject payloads (such as CFW bootloader, Nand/Key Dumper, etc)
