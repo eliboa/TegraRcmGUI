@@ -66,6 +66,7 @@ BEGIN_MESSAGE_MAP(DialogTab03, CDialogEx)
 	ON_BN_CLICKED(MIN_TO_TRAY, &DialogTab03::OnClickedMinToTray)
 	ON_BN_CLICKED(ID_INSTALL_DRIVER, &DialogTab03::OnBnClickedInstallDriver)
 	ON_BN_CLICKED(RUN_WINSTART, &DialogTab03::OnBnClickedWinstart)
+	ON_BN_CLICKED(IDC_BUTTON2, &DialogTab03::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -136,11 +137,14 @@ void DialogTab03::OnBnClickedWinstart()
 	{
 		// Remove shortcut
 		PathAppend(szPath, _T("\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\TegraRcmGUI.lnk"));
-		remove(CW2A(szPath));
+		if(remove(CW2A(szPath)) == 0) m_TegraRcm->AppendLogBox(TEXT("Winstart shortcut REMOVED\r\n"));
 	}
 
 	// Create new shortcut
-	if (IsCheckChecked) CreateLink();
+	if (IsCheckChecked) {
+		CreateLink();
+		m_TegraRcm->AppendLogBox(TEXT("Winstart shortcut ADDED\r\n"));
+	}
 }
 
 
@@ -218,4 +222,9 @@ void DialogTab03::CleanRegestry() {
 			}
 		}
 	}
+}
+
+void DialogTab03::OnBnClickedButton2()
+{
+	m_TegraRcm->SetLocale();
 }

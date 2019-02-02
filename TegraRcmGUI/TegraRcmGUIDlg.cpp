@@ -123,7 +123,7 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	CRect rc;
 	AfxGetMainWnd()->GetWindowRect(rc);
 	int width = rc.Width();
-	
+	int fontSize = width * 0.031;
 	if (width < 400)
 	{
 		RCM_BITMAP0.SetBitmap(INIT_LOGO_2);
@@ -144,6 +144,26 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 		RCM_BITMAP5.SetBitmap(LOADED);
 		RCM_BITMAP6.SetBitmap(LOAD_ERROR);
 	}
+
+	// Log Box
+	LOGFONT lf;
+	/*
+	CEdit* pBox = (CEdit*)AfxGetMainWnd()->GetDlgItem(IDC_LOG_BOX);	
+	CFont* old = pBox->GetFont();
+	old->GetLogFont(&lf);
+	CFont newfont;
+	newfont.CreateFont(lf.lfHeight + 30, 0, lf.lfEscapement, lf.lfOrientation, lf.lfWeight, lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut, lf.lfCharSet, lf.lfOutPrecision, lf.lfClipPrecision, lf.lfQuality, lf.lfPitchAndFamily, lf.lfFaceName);
+	pBox->SetFont(&newfont);
+	*/
+
+	CEdit* pBox = (CEdit*)AfxGetMainWnd()->GetDlgItem(IDC_LOG_BOX);
+
+	CFont *myFont = new CFont();
+	myFont->CreateFont(fontSize, 0, 0, 0, FW_NORMAL, false, false,
+		0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		FIXED_PITCH | FF_MODERN, _T("Verdana"));
+
+	pBox->SetFont(myFont);
 	
 
 	// Menu
@@ -168,7 +188,6 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	m_TegraRcm = new TegraRcm(this);
-
 	m_TegraRcm->AppendLog("new TegraRcm()");
 
 	// Kill other running process of app
@@ -204,6 +223,8 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	// Start timer to check RCM status every second
 	CTegraRcmGUIDlg::StartTimer();	
 
+
+
 	return TRUE;
 }
 void CTegraRcmGUIDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -220,17 +241,24 @@ HBRUSH CTegraRcmGUIDlg::OnCtlColor(CDC* pDC, CWnd *pWnd, UINT nCtlColor)
 	switch (nCtlColor)
 	{
 	case CTLCOLOR_STATIC:
+		/*
 		if (GetDlgItem(IDC_RAJKOSTO)->GetSafeHwnd() == pWnd->GetSafeHwnd() || GetDlgItem(SEPARATOR)->GetSafeHwnd() == pWnd->GetSafeHwnd())
 		{
 			pDC->SetTextColor(RGB(192, 192, 192));
 			pDC->SetBkMode(TRANSPARENT);
 			return (HBRUSH)GetStockObject(NULL_BRUSH);
 		}
+		*/
 		if (GetDlgItem(INFO_LABEL)->GetSafeHwnd() == pWnd->GetSafeHwnd())
 		{
 			pDC->SetBkMode(TRANSPARENT);
 			pDC->SetTextColor(m_TegraRcm->LabelColor);
 			return (HBRUSH) CreateSolidBrush( WhiteRGB );
+		}
+		if (GetDlgItem(IDC_LOG_BOX)->GetSafeHwnd() == pWnd->GetSafeHwnd())
+		{
+			pDC->SetBkMode(TRANSPARENT);
+			return (HBRUSH)CreateSolidBrush(WhiteRGB);
 		}
 		if (GetDlgItem(IDC_STATUS_BG)->GetSafeHwnd() == pWnd->GetSafeHwnd())
 		{
@@ -350,6 +378,8 @@ void CTegraRcmGUIDlg::MountCommand()
 	if (m_TegraRcm != NULL)
 	{
 		DialogTab02 *pt = (DialogTab02*)m_TegraRcm->m_Ctrltb2;
+		CComboBox* pmyComboBox = (CComboBox*)pt->GetDlgItem(ID_UMS_COMBO);
+		pmyComboBox->SetCurSel(3);
 		pt->OnBnClickedMountSd();
 	}
 }

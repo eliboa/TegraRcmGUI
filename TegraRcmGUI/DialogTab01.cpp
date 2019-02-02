@@ -147,6 +147,7 @@ BEGIN_MESSAGE_MAP(DialogTab01, CDialog)
 	ON_BN_CLICKED(ID_DEL_FAV, &DialogTab01::OnBnClickedDelFav)
 	ON_LBN_DBLCLK(IDC_LIST1, &DialogTab01::OnDblclkList1)
 	ON_LBN_SELCHANGE(IDC_LIST1, &DialogTab01::OnLbnSelchangeList1)
+	ON_MESSAGE(DM_GETDEFID, OnGetDefID)
 	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
@@ -245,6 +246,7 @@ void DialogTab01::InjectPayload()
 	{
 		m_TegraRcm->BitmapDisplay(LOADED);
 		m_TegraRcm->SendUserMessage("Payload injected !", VALID);
+		m_TegraRcm->AppendLogBox(TEXT("Payload successfully injected\r\n"));
 		m_TegraRcm->WAITING_RECONNECT = TRUE;
 		if (!m_TegraRcm->CmdShow) m_TegraRcm->ShowTrayIconBalloon(TEXT("Payload injected"), TEXT(" "), 1000, NIIF_INFO);
 	}
@@ -254,6 +256,10 @@ void DialogTab01::InjectPayload()
 		string s = "Error while injecting payload (RC=" + std::to_string(rc) + ")";
 		if (!m_TegraRcm->CmdShow) m_TegraRcm->ShowTrayIconBalloon(TEXT("Error"), TEXT("Error while injecting payload"), 1000, NIIF_ERROR);
 		m_TegraRcm->SendUserMessage(s.c_str(), INVALID);
+		CString rc_str;
+		rc_str.Format(L"%d", rc);
+		m_TegraRcm->AppendLogBox(TEXT("Error while injecting payload (RC=") + rc_str + TEXT(")\r\n"));
+
 		
 	}
 }
@@ -294,6 +300,7 @@ void DialogTab01::OnBnClickedAddFav()
 	m_TegraRcm->SaveFavorites();
 
 	m_TegraRcm->SendUserMessage("Favorite added", VALID);
+	m_TegraRcm->AppendLogBox(TEXT("New favorite added\r\n"));
 	return;
 }
 
@@ -309,6 +316,8 @@ void DialogTab01::OnBnClickedDelFav()
 		m_TegraRcm->Favorites.RemoveAt(i);
 		m_TegraRcm->SaveFavorites();
 		m_TegraRcm->SendUserMessage("Favorite removed", VALID);
+		m_TegraRcm->AppendLogBox(TEXT("Favorite removed\r\n"));
+
 	}
 	return;
 }
@@ -355,4 +364,8 @@ HBRUSH DialogTab01::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		break;
 	}
 	return hbr;
+}
+LRESULT DialogTab01::OnGetDefID(WPARAM wp, LPARAM lp)
+{
+	return MAKELONG(0, DC_HASDEFID);
 }

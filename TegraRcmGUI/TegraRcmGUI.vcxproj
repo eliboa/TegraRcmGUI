@@ -253,6 +253,7 @@
     <Image Include="res\add.ico" />
     <Image Include="res\bitmap2.bmp" />
     <Image Include="res\browse.ico" />
+    <Image Include="res\bunch-of-keys.ico" />
     <Image Include="res\delete.ico" />
     <Image Include="res\driver_ko.bmp" />
     <Image Include="res\driver_ko_2.bmp" />

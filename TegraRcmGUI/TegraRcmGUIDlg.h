@@ -125,4 +125,6 @@ public:
 private:
 	MyTabCtrl m_tbCtrl;
 	TegraRcm *m_TegraRcm;
+public:
+	afx_msg void OnEnChangeLogBox();
 };

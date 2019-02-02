@@ -4,6 +4,8 @@
 #include "TegraRcm.h"
 
 
+
+
 // DialogTab02 dialog
 
 class DialogTab02 : 
@@ -33,4 +35,5 @@ public:
 //	HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnBnClickedDumpBiskey();
 };

@@ -27,6 +27,9 @@ SOFTWARE.
 #include <stdlib.h>
 #include "stdafx.h"
 #include "TegraRcm.h"
+#include <sstream>
+#include <fstream>
+#include <codecvt>
 
 using namespace std;
 
@@ -35,7 +38,7 @@ TegraRcm::TegraRcm(CDialog* pParent /*=NULL*/)
 	m_Parent = pParent;
 	m_hWnd = AfxGetMainWnd()->GetSafeHwnd();
 	GetFavorites();
-	SendUserMessage("Waiting for device in RCM mode");
+	//SendUserMessage("Waiting for device in RCM mode");
 }
 
 TegraRcm::~TegraRcm()
@@ -303,6 +306,89 @@ LRESULT TegraRcm::OnTrayIconEvent(UINT wParam, LPARAM lParam)
 	return ERROR_SUCCESS;
 }
 
+void TegraRcm::SetLocale()
+{
+	TCHAR *rfile = GetAbsolutePath(TEXT("locale\\french.txt"), CSIDL_APPDATA);
+	std::wifstream wif(rfile);
+	wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+	if (wif.is_open())
+	{
+		wif.seekg(0, std::ios::beg);
+		std::wstring wline;
+		std::wstring stringName;
+		std::wstring value;
+		std::wstring delimiter = L"=";
+
+		while (wif.good())
+		{
+			std::getline(wif, wline);
+			if (!wif.eof())
+			{
+				if (wline.find(delimiter) != std::string::npos) {
+					stringName = wline.substr(0, wline.find(delimiter));
+					value = wline.substr(wline.find(delimiter) + 1, wline.length() + 1);
+					CString value2 = value.c_str();
+					value2.Replace(_T('#'), '\n');
+					int intValue = stoi(stringName.c_str());;
+					if (intValue > 0) {
+						
+						//TCITEM tcItem1;
+						//tcItem1.mask = TCIF_TEXT;
+						//tcItem1.pszText = _T("Test");
+					
+						//AfxGetMainWnd()->m_tbCtrl->
+						//m_tbCtrl.InsertItem(0, &tcItem1);
+						//m_Ctrltb1->SetWindowText(_T("test"));
+
+
+						if (m_Ctrltb1->GetDlgItem(intValue)) {
+							m_Ctrltb1->SetDlgItemText(intValue, value2);
+						}
+						if (m_Ctrltb2->GetDlgItem(intValue)) {
+							m_Ctrltb2->SetDlgItemText(intValue, value2);
+						}
+						if (m_Ctrltb3->GetDlgItem(intValue)) {
+							m_Ctrltb3->SetDlgItemText(intValue, value2);
+							
+						}
+					}
+				}
+			}
+		}
+		wif.close();
+	}
+}
+
+void TegraRcm::AppendLogBox(CString line) {
+	CEdit* pBox = (CEdit*)AfxGetMainWnd()->GetDlgItem(IDC_LOG_BOX);
+	CString Content;
+	pBox->GetWindowText(Content);
+	Content.Append(line);
+	AfxGetMainWnd()->SetDlgItemText(IDC_LOG_BOX, Content);
+	pBox->LineScroll(pBox->GetLineCount());
+	AfxGetMainWnd()->UpdateWindow();
+
+}
+void TegraRcm::UpdateLogBox() {
+	TCHAR *rfile = GetAbsolutePath(TEXT("out.log"), CSIDL_APPDATA);
+	CString Cline;
+	std::wifstream fin(rfile, std::ios::binary);
+	fin.imbue(std::locale(fin.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
+	for (wchar_t c; fin.get(c); ) {
+		CString Cchar(c);
+		if (Cchar == TEXT("\n")) {
+			Cline.Append(TEXT("\r\n"));
+			AppendLogBox(Cline);
+			Cline.Empty();
+		}
+		else if(Cchar != TEXT("\r")) {
+			Cline.Append(Cchar);
+		}
+	}
+	fin.close();
+
+}
+
 
 //
 // Presets functions
@@ -356,6 +442,10 @@ void TegraRcm::SetPreset(string param, string value)
 	readFile.close();
 	remove(CT2A(rfile));
 	rename(CT2A(wfile), CT2A(rfile));
+
+	CString paramStr(param.c_str()), valueStr(value.c_str());
+	AppendLogBox(TEXT("Preset \"") + paramStr + TEXT("\" set to : ") + valueStr + TEXT("\r\n"));
+
 }
 void TegraRcm::GetFavorites()
 {	
@@ -436,6 +526,7 @@ void TegraRcm::AddFavorite(CString value)
 	outFile.open(GetAbsolutePath(TEXT("favorites.conf"), CSIDL_APPDATA), fstream::in | fstream::out | fstream::app);
 	outFile << outLine;
 	outFile.close();
+
 }
 void TegraRcm::SaveFavorites()
 {
@@ -492,8 +583,13 @@ void TegraRcm::SendUserMessage(string message, int type)
 		LabelColor = RGB(0, 0, 0);
 		break;
 	}
-	AfxGetMainWnd()->SetDlgItemText(INFO_LABEL, wmessage);
+	//AfxGetMainWnd()->SetDlgItemText(INFO_LABEL, wmessage);
 	AppendLog(message);
+	/*
+	CString msgStr(message.c_str());
+	msgStr.Append(TEXT("\r\n"));
+	AppendLogBox(msgStr);
+	*/
 }
 
 
@@ -622,7 +718,9 @@ void TegraRcm::LookUp()
 		m_Ctrltb1->GetDlgItem(IDC_INJECT)->EnableWindow(TRUE);
 		m_Ctrltb2->GetDlgItem(IDC_SHOFEL2)->EnableWindow(TRUE);
 		m_Ctrltb2->GetDlgItem(IDC_MOUNT_SD)->EnableWindow(TRUE);
+		m_Ctrltb2->GetDlgItem(IDC_DUMP_BISKEY)->EnableWindow(TRUE);
 		m_Ctrltb3->GetDlgItem(ID_INSTALL_DRIVER)->EnableWindow(FALSE);
+		
 
 	}
 	// RCM Status = "USB Driver KO"
@@ -631,6 +729,7 @@ void TegraRcm::LookUp()
 		m_Ctrltb1->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 		m_Ctrltb2->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 		m_Ctrltb2->GetDlgItem(IDC_MOUNT_SD)->EnableWindow(FALSE);
+		m_Ctrltb2->GetDlgItem(IDC_DUMP_BISKEY)->EnableWindow(FALSE);
 		m_Ctrltb3->GetDlgItem(ID_INSTALL_DRIVER)->EnableWindow(TRUE);
 	}
 	// RCM Status = "RCM not detected"
@@ -639,6 +738,7 @@ void TegraRcm::LookUp()
 		m_Ctrltb1->GetDlgItem(IDC_INJECT)->EnableWindow(FALSE);
 		m_Ctrltb2->GetDlgItem(IDC_SHOFEL2)->EnableWindow(FALSE);
 		m_Ctrltb2->GetDlgItem(IDC_MOUNT_SD)->EnableWindow(FALSE);
+		m_Ctrltb2->GetDlgItem(IDC_DUMP_BISKEY)->EnableWindow(FALSE);
 		m_Ctrltb3->GetDlgItem(ID_INSTALL_DRIVER)->EnableWindow(TRUE);
 		// Delay Auto inject if needed
 		if (AUTOINJECT_CURR) DELAY_AUTOINJECT = TRUE;
@@ -654,6 +754,8 @@ void TegraRcm::LookUp()
 		// Status changed to "RCM Detected"
 		if (rc == 0)
 		{
+			AppendLogBox(TEXT("RCM Device detected\r\n"));
+
 			BitmapDisplay(RCM_DETECTED);
 
 			CString file;
@@ -665,7 +767,7 @@ void TegraRcm::LookUp()
 				if(AUTOINJECT_CURR) DELAY_AUTOINJECT = TRUE;
 				else DELAY_AUTOINJECT = FALSE;
 			}
-			if (DELAY_AUTOINJECT && file.GetLength() > 0)
+			if (DELAY_AUTOINJECT && file.GetLength() > 0 && AUTOINJECT_CURR)
 			{
 
 				BitmapDisplay(LOADING);
@@ -678,7 +780,8 @@ void TegraRcm::LookUp()
 				if (rc >= 0)
 				{
 					BitmapDisplay(LOADED);
-					SendUserMessage("Payload injected !", VALID);
+					//SendUserMessage("Payload injected !", VALID);
+					AppendLogBox(TEXT("Payload successfully injected\r\n"));
 					if (!CmdShow) ShowTrayIconBalloon(TEXT("Payload injected"), TEXT(" "), 1000, NIIF_INFO);
 					WAITING_RECONNECT = TRUE;
 				}
@@ -686,15 +789,19 @@ void TegraRcm::LookUp()
 				{
 					BitmapDisplay(LOAD_ERROR);
 					string s = "Error while injecting payload (RC=" + std::to_string(rc) + ")";
-					CString error = TEXT("Error while injecting payload");
+					CString rc_str;
+					rc_str.Format(L"%d", rc);
+					CString error = TEXT("Error while injecting payload (RC=") + rc_str + TEXT(")");
 					if (!CmdShow) ShowTrayIconBalloon(TEXT("Error"), error, 1000, NIIF_ERROR);
-					SendUserMessage(s.c_str(), INVALID);
+					//SendUserMessage(s.c_str(), INVALID);
+					AppendLogBox(error);
+
 				}
 				DELAY_AUTOINJECT = FALSE;
 			}
 			else
 			{
-				SendUserMessage("Waiting for user action");
+				SendUserMessage(labels[20].name);
 			}
 		}
 		// Status changed to "RCM not detected" or "USB driver KO"
@@ -704,6 +811,7 @@ void TegraRcm::LookUp()
 			if (rc > -5)
 			{
 				BitmapDisplay(DRIVER_KO);
+				AppendLogBox(TEXT("RCM device detected but APX driver is not installed\r\n"));
 				InstallDriver();
 			}
 			else
@@ -711,12 +819,15 @@ void TegraRcm::LookUp()
 				if (LookForAPXDevice())
 				{
 					BitmapDisplay(DRIVER_KO);
+					AppendLogBox(TEXT("RCM device detected but APX driver is not installed\r\n"));
 					InstallDriver();
 				}
 				else
 				{
 					BitmapDisplay(RCM_NOT_DETECTED);
-					if (FIRST_LOOKUP) SendUserMessage("Waiting for device in RCM mode");;
+					if (!FIRST_LOOKUP) AppendLogBox(TEXT("RCM device disconnected\r\n"));
+					else AppendLogBox(TEXT("No RCM device detected\r\n"));
+					if (FIRST_LOOKUP) SendUserMessage(labels[21].name);
 				}
 			}
 		}
@@ -733,7 +844,7 @@ void TegraRcm::LookUp()
 //
 // Smasher => TegraRcmSmash.exe calls
 //
-int TegraRcm::Smasher(TCHAR args[])
+int TegraRcm::Smasher(TCHAR args[4096], BOOL bInheritHandles)
 {
 	if (WAITING_RECONNECT)
 	{
@@ -747,11 +858,29 @@ int TegraRcm::Smasher(TCHAR args[])
 		}
 		WAITING_RECONNECT = FALSE;
 	}
-	
+
+	// This should fix RC-50 issue, ! At last.
+	TCHAR szPath[_MAX_PATH];
+	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
+	CString csPathf(szPath);
+	int nIndex = csPathf.ReverseFind(_T('\\'));
+	if (nIndex > 0) csPath = csPathf.Left(nIndex);
+	else csPath.Empty();
+	CString csPath2(csPath);
+	csPath.Append(TEXT(".\\TegraRcmSmash.exe "));
+	TCHAR cmd[4096];
+	_tcscpy_s(cmd, csPath);
+	lstrcat(cmd, args);
+
+
 	SECURITY_ATTRIBUTES sa;
 	sa.nLength = sizeof(sa);
 	sa.lpSecurityDescriptor = NULL;
 	sa.bInheritHandle = TRUE;
+
+	TCHAR *rfile = GetAbsolutePath(TEXT("out.log"), CSIDL_APPDATA);
+	remove(CT2A(rfile));
+
 	PROCESS_INFORMATION pi;
 	STARTUPINFO si;
 	BOOL ret = FALSE;
@@ -761,20 +890,24 @@ int TegraRcm::Smasher(TCHAR args[])
 	si.cb = sizeof(STARTUPINFO);
 	si.dwFlags |= STARTF_USESTDHANDLES;
 	si.hStdInput = NULL;
+	if (bInheritHandles) {
+	    HANDLE h = CreateFile(rfile,
+			GENERIC_WRITE,
+			FILE_SHARE_WRITE | FILE_SHARE_READ,
+			&sa,
+			OPEN_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+		si.hStdError = h;
+		si.hStdOutput = h;
+	}
 
-	// This should fix RC-50 issue, ! At last.
-	TCHAR szPath[_MAX_PATH];
-	VERIFY(::GetModuleFileName(AfxGetApp()->m_hInstance, szPath, _MAX_PATH));
-	CString csPathf(szPath);
-	int nIndex = csPathf.ReverseFind(_T('\\'));
-	if (nIndex > 0) csPath = csPathf.Left(nIndex);
-	else csPath.Empty();
-	csPath.Append(TEXT(".\\TegraRcmSmash.exe "));
-	TCHAR cmd[MAX_PATH];
-	_tcscpy_s(cmd, csPath);	
-	lstrcat(cmd, args);
-	
-	ret = CreateProcess(NULL, cmd, NULL, NULL, FALSE, flags, NULL, NULL, &si, &pi);
+	CString argsStr(args);
+	CString msgStr(TEXT("Invoking TegraRcmSmash.exe with args : ") + argsStr + TEXT("\r\n"));
+	AppendLogBox(msgStr);
+
+
+	ret = CreateProcess(NULL, cmd, NULL, NULL, bInheritHandles, flags, NULL, NULL, &si, &pi);
 	int rc = -50;
 	if (NULL != ret)
 	{
@@ -802,8 +935,7 @@ int TegraRcm::Smasher(TCHAR args[])
 		CloseHandle(pi.hThread);
 	}
 	else {
-		
-		int lastErrorCode = GetLastError();		
+		int lastErrorCode = GetLastError();
 		LPWSTR lpMsgBuf = NULL;
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
 			NULL,
@@ -814,9 +946,14 @@ int TegraRcm::Smasher(TCHAR args[])
 			NULL);
 		std::string MyString = CW2A(lpMsgBuf);
 		std::string intStr = std::to_string(lastErrorCode);
-		AppendLog(intStr);
-		AppendLog(MyString);
+		//AppendLog(intStr);
+		//AppendLog(MyString);
 		
+		CString CLogBuf(lpMsgBuf);
+		msgStr = TEXT("Error : ") + CLogBuf + TEXT("\r\n");
+	}
+	if (bInheritHandles) {
+		UpdateLogBox();
 	}
 	return rc;
 }
@@ -919,7 +1056,7 @@ TCHAR* TegraRcm::GetAbsolutePath(TCHAR* relative_path, DWORD  dwFlags)
 {
 	//
 	//
-	BOOL PORTABLE = FALSE;
+	BOOL PORTABLE = TRUE;
 	//
 	//
 

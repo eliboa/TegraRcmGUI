@@ -194,5 +194,8 @@
     <Image Include="res\init_logo_2.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\bunch-of-keys.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

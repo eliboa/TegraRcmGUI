@@ -40,4 +40,5 @@ public:
 	afx_msg void OnLbnSelchangeList1();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	COleDropTarget FileDropTarget;
+	afx_msg LRESULT OnGetDefID(WPARAM wp, LPARAM lp);
 };
