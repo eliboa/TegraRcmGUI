@@ -14,6 +14,14 @@ C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajko
 
 ![Png](http://tegrarcmgui.gq/TegraRcmGUI_v2.5.png)
 
+## How to backup/restore your Nintendo Switch's NAND ?
+
+ 1) Use [memloader](https://github.com/rajkosto/memloader) v3 to mount eMMC on your computer
+ 2) Download and open [NxNandManager](https://github.com/eliboa/NxNandManager). Select "File" then "Open drive".   
+ 3) Select the mounted drive. You can now perform backup/restore operations.   
+
+![Png](http://splatoon.eu/switch/NxNandManager_v1.1_howto_open_drive.png)   
+
 ## Download
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases/latest) (Windows)
 
