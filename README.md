@@ -14,14 +14,6 @@ C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajko
 
 ![Png](http://tegrarcmgui.gq/TegraRcmGUI_v2.5.png)
 
-## How to backup/restore your Nintendo Switch's NAND ?
-
- 1) Use [memloader](https://github.com/rajkosto/memloader) v3 to mount eMMC on your computer
- 2) Download and open [NxNandManager](https://github.com/eliboa/NxNandManager). Select "File" then "Open drive".   
- 3) Select the mounted drive. You can now perform backup/restore operations.   
-
-![Png](http://splatoon.eu/switch/NxNandManager_v1.1_howto_open_drive.png)   
-
 ## Download
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases/latest) (Windows)
 
@@ -34,7 +26,15 @@ For other platforms, you can use :
 - [Web Fusée Launcher](https://fusee-gelee.firebaseapp.com/) (Cross-platform, only works with Chrome)
 
 ## Issue / Suggestion
-Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report a bug or submit a suggestion.
+Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report a bug or submit a suggestion.   
+
+## How to backup/restore your Nintendo Switch's NAND ?
+
+ 1) Use [memloader](https://github.com/rajkosto/memloader) v3 to mount eMMC on your computer
+ 2) Download and open [NxNandManager](https://github.com/eliboa/NxNandManager). Select "File" then "Open drive".   
+ 3) Select the mounted drive. You can now perform backup/restore operations.   
+
+![Png](http://splatoon.eu/switch/NxNandManager_v1.1_howto_open_drive.png)   
 
 ## Credits
 - [Rajkosto](https://github.com/rajkosto) / [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) (Fusée Launcher reimplementation for Windows), [memloader](https://github.com/rajkosto/memloader), SD tool, [biskeydump](https://github.com/rajkosto/biskeydump)
