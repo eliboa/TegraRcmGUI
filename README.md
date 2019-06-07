@@ -12,7 +12,7 @@ C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajko
 - Option - Run app at Windows startup 
 - Install APX device driver (if needed)
 
-![Png](http://tegrarcmgui.gq/TegraRcmGUI_v2.5.png)
+![Png](http://laumonier.org/TegraRcmGUI_v2.5.png)
 
 ## Download
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases/latest) (Windows)
