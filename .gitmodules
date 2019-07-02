@@ -1,0 +1,3 @@
+[submodule "TegraRcmGUI/tools/src/biskeydump"]
+	path = TegraRcmGUI/tools/src/biskeydump
+	url = https://github.com/eliboa/biskeydump
