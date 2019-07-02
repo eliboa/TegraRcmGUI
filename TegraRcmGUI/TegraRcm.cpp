@@ -259,7 +259,7 @@ void TegraRcm::ShowContextMenu(HWND hWnd)
 		DestroyMenu(hMenu);
 	}
 }
-LRESULT TegraRcm::OnTrayIconEvent(UINT wParam, LPARAM lParam)
+LRESULT TegraRcm::OnTrayIconEvent(WPARAM wParam, LPARAM lParam)
 {
 	if ((UINT)wParam != ID_SYSTEMTRAY)
 	{

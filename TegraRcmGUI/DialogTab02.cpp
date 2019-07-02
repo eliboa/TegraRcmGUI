@@ -204,7 +204,7 @@ void DialogTab02::OnBnClickedShofel2()
 			STARTUPINFO si;
 			ZeroMemory(&si, sizeof(si));
 			si.cb = sizeof(si);
-			TCHAR *download_script = m_TegraRcm->GetAbsolutePath(TEXT("shofel2\\download.bat"), CSIDL_APPDATA);
+			TCHAR *download_script = m_TegraRcm->GetAbsolutePath(TEXT("tools\\shofel2\\download.bat"), CSIDL_APPDATA);
 			BOOL bRet = CreateProcess(download_script, NULL, NULL, NULL, FALSE, 0, NULL, exe_dir, &si, &pif);
 		}
 		return; // TO-DO : Remove return for coreboot injection after download

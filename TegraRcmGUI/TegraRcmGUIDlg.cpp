@@ -326,7 +326,7 @@ void CTegraRcmGUIDlg::OnClose()
 	PostQuitMessage(0);
 }
 
-LRESULT CTegraRcmGUIDlg::OnTrayIconEvent(UINT wParam, LPARAM lParam)
+LRESULT CTegraRcmGUIDlg::OnTrayIconEvent(WPARAM wParam, LPARAM lParam)
 {
 	return m_TegraRcm->OnTrayIconEvent(wParam, lParam);
 }
@@ -445,7 +445,7 @@ void CTegraRcmGUIDlg::StopTimer()
 	KillTimer(ID_TIMER_MINUTE);
 	KillTimer(ID_TIMER_SECONDS);
 }
-void CTegraRcmGUIDlg::OnTimer(UINT nIDEvent)
+void CTegraRcmGUIDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// Each second
 	if (nIDEvent == ID_TIMER_SECONDS)

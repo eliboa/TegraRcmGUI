@@ -64,7 +64,7 @@ public:
 	BOOL SetTrayIcon(WORD wIconID);
 	void ShowContextMenu(HWND hWnd);
 	BOOL DestroyTrayIcon();
-	LRESULT OnTrayIconEvent(UINT wParam, LPARAM lParam);
+	LRESULT OnTrayIconEvent(WPARAM wParam, LPARAM lParam);
 
 	BOOL PAUSE_LKP_DEVICE = FALSE;
 	BOOL AUTOINJECT_CURR = FALSE;

@@ -90,14 +90,14 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnDestroy();
-	afx_msg LRESULT OnTrayIconEvent(UINT wParam, LPARAM lParam);
+	afx_msg LRESULT OnTrayIconEvent(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 	afx_msg LRESULT OnQueryEndSession(WPARAM wParm, LPARAM lParm);
 
 public:
 	void StartTimer();
 	void StopTimer();
-	void OnTimer(UINT nIDEvent);
+	void OnTimer(UINT_PTR nIDEvent);
 	int STATUS;
 	afx_msg void BitmapDisplay(int IMG);
 	
