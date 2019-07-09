@@ -1,5 +1,7 @@
 # TegraRcmGUI
 C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (Fusée Gelée exploit for Nintendo Switch)
+  
+The RCM exploit only works on "unpatched" units, i.e manufactured before July 2018. To check if your Switch is patched, use https://ismyswitchpatched.com/
 
 ## Features
 - Inject payloads (such as CFW bootloader, Nand/Key Dumper, etc)
