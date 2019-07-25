@@ -36,7 +36,7 @@ Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report 
  2) Download and open [NxNandManager](https://github.com/eliboa/NxNandManager). Select "File" then "Open drive".   
  3) Select the mounted drive. You can now perform backup/restore operations.   
 
-![Png](http://splatoon.eu/switch/NxNandManager_v1.1_howto_open_drive.png)   
+![Png](http://laumonier.org/switch/NxNandManager_v1.1_howto_open_drive.png)   
 
 ## Credits
 - [Rajkosto](https://github.com/rajkosto) / [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) (Fusée Launcher reimplementation for Windows), [memloader](https://github.com/rajkosto/memloader), SD tool, [biskeydump](https://github.com/rajkosto/biskeydump)
