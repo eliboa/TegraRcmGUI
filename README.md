@@ -4,7 +4,7 @@ C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajko
 The RCM exploit only works on "unpatched" units, i.e manufactured before July 2018. To check if your Switch is patched, use https://ismyswitchpatched.com/
 
 ## Features
-- Inject payloads (such as CFW bootloader, Nand/Key Dumper, etc)
+- Inject payloads
 - Manage favorites
 - Run Linux on your switch (ShofEL2)
 - Mount device as USB mass storage (read/write from/to SD card & NAND partitions, hold power button down for 5sec to exit)
