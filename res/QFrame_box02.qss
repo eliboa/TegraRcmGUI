@@ -1,0 +1,21 @@
+QFrame 
+{
+    border-radius: 10px; 
+    border-color: rgb(0, 0, 0);
+    background-color: rgb(41, 41, 41);
+    color: rgb(0, 0, 0);
+}
+QLabel 
+{
+    border-radius: 0px;
+	font: 10pt "Calibri";
+	color: rgb(255, 255, 255);
+}
+QLineEdit
+{
+    border-color: rgb(0, 0, 0);
+    background-color: rgb(60, 60, 60);
+    font: 9pt "Calibri";
+    border-radius: 2px; 
+    color: rgb(255, 255, 255);
+}

@@ -1,0 +1,20 @@
+QFrame 
+{
+    border-radius:0px;
+    background-color: rgb(60, 60, 60);
+    border-bottom: 1px solid #37373D;    
+}
+QLabel 
+{
+    border-radius: 0px;
+	font: 12pt "Calibri";	
+	color: rgb(255, 255, 255);
+	border:0px;
+}
+QPushButton 
+{
+    border-radius: 10px;
+    font: 75 8pt "MS Shell Dlg 2";
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+}

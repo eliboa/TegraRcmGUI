@@ -1,0 +1,26 @@
+QTabWidget::pane {
+	border-radius:10px;
+	background-color: rgb(255, 255, 255);
+}
+ QTabWidget::tab-bar 
+{
+     left: 10px; 
+ }
+QTabBar::tab {
+    border: 0px;
+    border-top-left-radius: 6px; /* For rounded corners */
+    border-top-right-radius: 6px;
+    min-width: 8ex;
+    padding: 6px; /* Padding inside each tab */
+    margin-left: 4px; /* Margins among the tabs */
+    margin-right: 4px;
+	background-color: rgb(213, 213, 213);
+   font: 75 9pt "Calibri"; 
+   color: rgb(0, 0, 0);
+}
+
+QTabBar::tab:selected {
+	background-color: rgb(0, 150, 136);
+    border-color: grey;	
+    color: rgb(255, 255, 255);
+}
