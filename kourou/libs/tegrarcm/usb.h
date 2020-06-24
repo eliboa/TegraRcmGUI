@@ -32,6 +32,9 @@
 #include <stdbool.h>
 #include <libusb.h>
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 #if defined(LIBUSBX_API_VERSION) && (LIBUSBX_API_VERSION >= 0x01000102)
 #define HAVE_USB_PORT_MATCH
 #define PORT_MATCH_MAX_PORTS 7
@@ -39,9 +42,13 @@
 
 #define USB_VENID_NVIDIA 0x955
 #define USB_DEVID_NVIDIA_TEGRA20 0x20
+#define USB_DEVID_NINTENDO_SWITCH 0x21
 #define USB_DEVID_NVIDIA_TEGRA30 0x30
 #define USB_DEVID_NVIDIA_TEGRA114 0x35
 #define USB_DEVID_NVIDIA_TEGRA124 0x40
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 typedef struct {
 	libusb_device_handle *handle;

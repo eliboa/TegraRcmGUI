@@ -26,9 +26,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "config.h"
-
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -43,39 +40,36 @@ using std::string;
 #include <cstdlib>
 using std::exit;
 
-#define CRYPTOPP_INCLUDE_CRYPTLIB	<CRYPTOLIB_HEADER_PREFIX/cryptlib.h>
-#define CRYPTOPP_INCLUDE_FILES		<CRYPTOLIB_HEADER_PREFIX/files.h>
-#define CRYPTOPP_INCLUDE_FILTERS	<CRYPTOLIB_HEADER_PREFIX/filters.h>
-#define CRYPTOPP_INCLUDE_INTEGER	<CRYPTOLIB_HEADER_PREFIX/integer.h>
-#define CRYPTOPP_INCLUDE_OSRNG		<CRYPTOLIB_HEADER_PREFIX/osrng.h>
-#define CRYPTOPP_INCLUDE_QUEUE		<CRYPTOLIB_HEADER_PREFIX/queue.h>
-#define CRYPTOPP_INCLUDE_RSA		<CRYPTOLIB_HEADER_PREFIX/rsa.h>
-#define CRYPTOPP_INCLUDE_PSSR		<CRYPTOLIB_HEADER_PREFIX/pssr.h>
-#define CRYPTOPP_INCLUDE_SHA		<CRYPTOLIB_HEADER_PREFIX/sha.h>
-#define CRYPTOPP_INCLUDE_SECBLOCK	<CRYPTOLIB_HEADER_PREFIX/secblock.h>
-
-#include CRYPTOPP_INCLUDE_CRYPTLIB
-#include CRYPTOPP_INCLUDE_FILES
-#include CRYPTOPP_INCLUDE_FILTERS
-#include CRYPTOPP_INCLUDE_INTEGER
-#include CRYPTOPP_INCLUDE_OSRNG
-#include CRYPTOPP_INCLUDE_QUEUE
-#include CRYPTOPP_INCLUDE_RSA
-#include CRYPTOPP_INCLUDE_PSSR
-#include CRYPTOPP_INCLUDE_SHA
-#include CRYPTOPP_INCLUDE_SECBLOCK
-
+#include "cryptlib.h"
 using CryptoPP::Exception;
+
+#include "integer.h"
 using CryptoPP::Integer;
+
+#include "files.h"
 using CryptoPP::FileSource;
+
+#include "filters.h"
 using CryptoPP::StringSink;
 using CryptoPP::SignerFilter;
+
+#include "queue.h"
 using CryptoPP::ByteQueue;
+
+#include "rsa.h"
 using CryptoPP::RSA;
 using CryptoPP::RSASS;
+
+#include "pssr.h"
 using CryptoPP::PSS;
+
+#include "sha.h"
 using CryptoPP::SHA256;
+
+#include "secblock.h"
 using CryptoPP::SecByteBlock;
+
+#include "osrng.h"
 using CryptoPP::AutoSeededRandomPool;
 
 #include "rsa-pss.h"

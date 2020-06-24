@@ -8,8 +8,9 @@ QFrame
 QLabel 
 {
     border-radius: 0px;
-	font: 10pt "Calibri";
-	color: rgb(255, 255, 255);
+    font: 10pt "Calibri";
+    background-color: rgb(41, 41, 41);
+    color: rgb(255, 255, 255);
 }
 QLineEdit
 {
@@ -17,5 +18,10 @@ QLineEdit
     background-color: rgb(60, 60, 60);
     font: 9pt "Calibri";
     border-radius: 2px; 
+    color: rgb(255, 255, 255);
+}
+QToolTip
+{
+    background-color: rgb(30, 30, 30);
     color: rgb(255, 255, 255);
 }

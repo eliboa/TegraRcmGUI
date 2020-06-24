@@ -2,4 +2,17 @@ QMainWindow
 {
     background-color: rgb(30, 30, 30);
     border-radius: 10px; 
+    color: rgb(255, 255, 255);
+}
+QStatusBar
+{
+    color: rgb(255, 255, 255);
+}
+QToolTip
+{
+    background-color: rgb(30, 30, 30);
+    color: rgb(255, 255, 255);
+}
+QMessageBox QLabel {
+    color: rgb(0, 0, 0);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, NVIDIA CORPORATION
+< * Copyright (c) 2011-2016, NVIDIA CORPORATION
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,7 @@ static int usb_match(libusb_device *dev, uint16_t venid, uint16_t *devid
 	}
 	switch (desc.idProduct & 0xff) {
 	case USB_DEVID_NVIDIA_TEGRA20:
+	case USB_DEVID_NINTENDO_SWITCH:
 	case USB_DEVID_NVIDIA_TEGRA30:
 	case USB_DEVID_NVIDIA_TEGRA114:
 	case USB_DEVID_NVIDIA_TEGRA124:

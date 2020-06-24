@@ -113,6 +113,10 @@ typedef struct {
 #define RCM_OP_MODE_ODM_OPEN        0x5
 #define RCM_OP_MODE_ODM_SECURE_PKC  0x6
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int rcm_init(uint32_t version, const char *keyfile);
 uint32_t rcm_get_msg_len(uint8_t *msg);
 int rcm_create_msg(
@@ -122,5 +126,9 @@ int rcm_create_msg(
 	uint8_t *payload,
 	uint32_t payload_len,
 	uint8_t **msg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RCM_H

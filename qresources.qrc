@@ -1,2 +1,17 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<RCC>
+    <qresource prefix="/">
+        <file alias="ariane_bin">ariane/out/ariane.bin</file>
+        <file>res/switch_logo_off.png</file>
+        <file>res/switch_logo_on.png</file>
+        <file>res/QTabWidget.qss</file>
+        <file>res/QPushButton.qss</file>
+        <file>res/QLabel_title01.qss</file>
+        <file>res/QTableView.qss</file>
+        <file>res/QFrame_box01.qss</file>
+        <file>res/QMainWindow.qss</file>
+        <file>res/QFrame_titleBar.qss</file>
+        <file>res/QFrame_box02.qss</file>
+        <file>res/delete.ico</file>
+        <file>res/add.ico</file>
+    </qresource>
+</RCC>

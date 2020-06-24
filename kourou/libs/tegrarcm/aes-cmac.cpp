@@ -26,9 +26,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "config.h"
-
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -43,29 +40,26 @@ using std::string;
 #include <cstdlib>
 using std::exit;
 
-#define CRYPTOPP_INCLUDE_CRYPTLIB	<CRYPTOLIB_HEADER_PREFIX/cryptlib.h>
-#define CRYPTOPP_INCLUDE_CMAC		<CRYPTOLIB_HEADER_PREFIX/cmac.h>
-#define CRYPTOPP_INCLUDE_AES		<CRYPTOLIB_HEADER_PREFIX/aes.h>
-#define CRYPTOPP_INCLUDE_HEX		<CRYPTOLIB_HEADER_PREFIX/hex.h>
-#define CRYPTOPP_INCLUDE_FILTERS	<CRYPTOLIB_HEADER_PREFIX/filters.h>
-#define CRYPTOPP_INCLUDE_SECBLOCK	<CRYPTOLIB_HEADER_PREFIX/secblock.h>
-
-#include CRYPTOPP_INCLUDE_CRYPTLIB
-#include CRYPTOPP_INCLUDE_CMAC
-#include CRYPTOPP_INCLUDE_AES
-#include CRYPTOPP_INCLUDE_HEX
-#include CRYPTOPP_INCLUDE_FILTERS
-#include CRYPTOPP_INCLUDE_SECBLOCK
-
+#include "cryptlib.h"
 using CryptoPP::Exception;
+
+#include "cmac.h"
 using CryptoPP::CMAC;
+
+#include "aes.h"
 using CryptoPP::AES;
+
+#include "hex.h"
 using CryptoPP::HexEncoder;
 using CryptoPP::HexDecoder;
+
+#include "filters.h"
 using CryptoPP::StringSink;
 using CryptoPP::StringSource;
 using CryptoPP::HashFilter;
 using CryptoPP::HashVerificationFilter;
+
+#include "secblock.h"
 using CryptoPP::SecByteBlock;
 
 extern "C" int cmac_hash(const unsigned char *msg, int len, unsigned char *cmac_buf)
