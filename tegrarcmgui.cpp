@@ -2,6 +2,7 @@
 #include "ui_tegrarcmgui.h"
 #include "qutils.h"
 #include <QPoint>
+#include <Windows.h>
 
 QMouseEvent MouseLeftButtonEvent(QEvent::MouseButtonPress, QPoint(0,0), Qt::LeftButton, nullptr, nullptr);
 
@@ -32,6 +33,9 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     // Init acces to builtin resources
     Q_INIT_RESOURCE(qresources);
 
+    // Load settings
+    userSettings = new QSettings("nx", "TegraRcmGUI");
+
     // Tray icon init
     trayIcon = new QSystemTrayIcon;
     trayIcon->setIcon(switchOffIcon);
@@ -39,14 +43,22 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     connect(trayIcon, &QSystemTrayIcon::activated, this, &TegraRcmGUI::trayIconActivated);
     trayIconMenu = trayIcon->contextMenu();
 
-    // Load settings
-    userSettings = new QSettings("nx", "TegraRcmGUI");
-
     // Create a qKourou instance to invoke Kourou methods (asynchronously) using signals and slots
     m_kourou = new QKourou(this, &m_device, this);
 
     m_kourou->autoLaunchAriane = userSettings->value("autoAriane").toBool();
     m_kourou->autoInjectPayload = userSettings->value("autoInject").toBool();
+
+    // Init tabs
+    ui->tabWidget->tabBar()->setCursor(Qt::PointingHandCursor);
+    ui->push_layout->setAlignment(Qt::AlignTop);
+    ui->pushLayoutWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
+    payloadTab = new QPayloadWidget(this);
+    ui->tabWidget->addTab(payloadTab, tr("PAYLOAD"));
+    toolsTab = new qTools(this);
+    ui->tabWidget->addTab(toolsTab, tr("TOOLS"));
+    settingsTab = new qSettings(this);
+    ui->tabWidget->addTab(settingsTab, tr("SETTINGS"));
 
     // Load builtin Ariane payload
     QFile file(":/ariane_bin");
@@ -54,7 +66,7 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     {
         m_kourou->ariane_bin = file.readAll();
         file.close();
-    }
+    }    
 
     // Init device at startup (in a concurrent thread)
     QtConcurrent::run(m_kourou, &QKourou::initDevice, true, nullptr);
@@ -74,7 +86,8 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     devInfoTimer->start(60000*5); // Every 5 minutes
     QTimer *pushTimer = new QTimer(this);
     connect(pushTimer, SIGNAL(timeout()), this, SLOT(pushTimer()));
-    pushTimer->start(1000); // Every minute
+    pushTimer->start(1000); // Every second
+    m_kourou->initNoDriverDeviceLookUpLoop();
 
 
     /// GUI inits
@@ -85,16 +98,6 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     ui->titleBarFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_titleBar.qss"));
     ui->statusBoxFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box01.qss"));
     ui->deviceInfoBoxFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box01.qss"));
-
-    // Init tabs
-    ui->tabWidget->tabBar()->setCursor(Qt::PointingHandCursor);
-    ui->push_layout->setAlignment(Qt::AlignTop);
-    ui->pushLayoutWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
-
-    payloadTab = new QPayloadWidget(this);        
-    ui->tabWidget->addTab(payloadTab, tr("PAYLOAD"));
-    toolsTab = new qTools(this);
-    ui->tabWidget->addTab(toolsTab, tr("TOOLS"));
 
     ui->closeAppBtn->setCursor(Qt::PointingHandCursor);
     connect(ui->closeAppBtn, SIGNAL(clicked()), this, SLOT(close()));
@@ -136,19 +139,33 @@ void TegraRcmGUI::deviceInfoTimer()
 
 void TegraRcmGUI::on_deviceStateChange()
 {
-    ui->devStatusLbl_2->setText(m_device.getStatus() == CONNECTED ? tr("CONNECTED") : tr("DISCONNECTED"));
+    ui->devStatusLbl_2->setText(tr("DEVICE STATUS"));
     ui->devStatusFrame->setStyleSheet(m_device.getStatus() == CONNECTED ? statusOnStyleSht : statusOffStyleSht);
     ui->rcmStatusLbl_2->setText(m_device.rcmIsReady() ? tr("READY") : tr("OFF"));
-    QString arianeStatus;
+    QString arianeStatus, arianeStyle;
     if (m_kourou->arianeIsLoading)
+    {
         arianeStatus.append(tr("LOADING"));
+        arianeStyle = statusOffStyleSht;
+    }
     else if (m_device.arianeIsReady())
+    {
         arianeStatus.append(tr("READY"));
+        arianeStyle = statusOnStyleSht;
+    }
     else
+    {
         arianeStatus.append(tr("OFF"));
+        arianeStyle = m_kourou->autoLaunchAriane ? statusOffRedStyleSht : statusOffStyleSht;
+    }
     ui->arianeStatusLbl_2->setText(arianeStatus);
-    ui->rcmStatusFrame->setStyleSheet(m_device.rcmIsReady() ? statusOnStyleSht : statusOffStyleSht);
-    ui->arianeStatusFrame->setStyleSheet(m_device.arianeIsReady() ? statusOnStyleSht : statusOffStyleSht);
+    QString style = statusOffRedStyleSht;
+    if (m_device.arianeIsReady())
+        style = statusOffStyleSht;
+    else if (m_device.rcmIsReady())
+        style = statusOnStyleSht;
+    ui->rcmStatusFrame->setStyleSheet(style);
+    ui->arianeStatusFrame->setStyleSheet(arianeStyle);
     if (!m_device.arianeIsReady())
         clearDeviceInfo();
 
@@ -157,8 +174,11 @@ void TegraRcmGUI::on_deviceStateChange()
     else
         trayIcon->setIcon(switchOffIcon);
 
-    payloadTab->on_deviceStateChange();
+    if (m_device.getStatus() != CONNECTED || !m_device.rcmIsReady())
+        m_deviceInfoAvailable = false;
 
+    payloadTab->on_deviceStateChange();
+    toolsTab->on_deviceStateChange();
 }
 
 void TegraRcmGUI::on_autoLaunchAriane_toggled(bool value)
@@ -166,8 +186,15 @@ void TegraRcmGUI::on_autoLaunchAriane_toggled(bool value)
     m_kourou->autoLaunchAriane = !m_kourou->autoLaunchAriane;
     userSettings->setValue("autoAriane", m_kourou->autoLaunchAriane);
 
-    if (m_device.rcmIsReady() && m_kourou->autoLaunchAriane)
+    on_deviceStateChange();
+
+    if (!m_kourou->autoLaunchAriane)
+        return;
+
+    if (m_device.rcmIsReady())
         QtConcurrent::run(m_kourou, &QKourou::initDevice, true, nullptr);
+    else if (!m_device.arianeIsReady())
+        pushMessage((m_device.getStatus() == CONNECTED ? tr("Reboot") : tr("Boot")) + tr(" device to RCM to launch Ariane"));
 }
 
 bool TegraRcmGUI::enableWidget(QWidget *widget, bool enable)
@@ -200,6 +227,12 @@ void TegraRcmGUI::clearDeviceInfo()
 
 void TegraRcmGUI::on_deviceInfo_received(UC_DeviceInfo di)
 {
+    if (!m_deviceInfoAvailable)
+    {
+        m_deviceInfoAvailable = true;
+        toolsTab->on_deviceStateChange();
+    }
+    else m_deviceInfoAvailable = true;
     ui->batteryLbl->show();
     ui->burntFusesLbl1->show();
     ui->sdfsLbl1->show();
@@ -230,11 +263,27 @@ void TegraRcmGUI::on_deviceInfo_received(UC_DeviceInfo di)
         ui->fsTotSizeLbl2->setText("N/A");
         ui->fsFreeSpaceLbl2->setText("N/A");
     }
+
+    if (di.autoRCM != toolsTab->autoRCM_switch->isActive())
+        toolsTab->autoRCM_switch->toggle();
 }
 
 void TegraRcmGUI::error(int error)
 {
-    QMessageBox::critical(this, "Error", QString().asprintf("Error %d", error));
+    if (error == FAILED_TO_SET_AUTORCM)
+        toolsTab->autoRCM_switch->toggle();
+
+    QString err_label;
+    for (ErrorLabel item : ErrorLabelArr)
+    {
+        if (item.error == error)
+            err_label = item.label;
+    }
+
+    if (!err_label.size())
+        err_label.append(QString().asprintf("Error %d", error));
+
+    QMessageBox::critical(this, "Error", err_label);
 }
 
 void TegraRcmGUI::pushMessage(QString message)

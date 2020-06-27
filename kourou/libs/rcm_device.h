@@ -18,6 +18,9 @@
 #define RCMDEVICE_H
 
 #include <windows.h>
+#include <setupapi.h>
+#include <stdio.h>
+#include <tchar.h>
 #include "libusbk_int.h"
 #include <string>
 #include "../../types.h"
@@ -147,7 +150,7 @@ private:
     bool m_usbAPI_loaded = false;
     DEVICE_STATUS m_devStatus;
 
-private:
+private:    
     bool getPluggedDevice(KLST_DEVINFO_HANDLE *devinfo);
     int switchToHighBuffer();
     u32 getCurrentBufferAddress() const { return m_currentBuffer == 0 ? 0x40005000u : 0x40009000u; }

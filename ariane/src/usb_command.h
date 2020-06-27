@@ -24,7 +24,9 @@ typedef enum _UC_CommandType
     PUSH_PAYLOAD,
     REBOOT_RCM,
     GET_DEVICE_INFO,
-    GET_STATUS
+    GET_STATUS,
+    SET_AUTORCM_ON,
+    SET_AUTORCM_OFF
 
 } UC_CommandType;
 

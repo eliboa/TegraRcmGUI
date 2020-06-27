@@ -56,11 +56,12 @@ QPayloadWidget::QPayloadWidget(TegraRcmGUI *parent) : QWidget(parent)
         buttons.at(i)->setCursor(Qt::PointingHandCursor);
 
     }
+    this->setStyleSheet(GetStyleSheetFromResFile(":/res/QMainWindow.qss"));
     ui->payload_tableView->setStyleSheet(GetStyleSheetFromResFile(":/res/QTableView.qss"));
     ui->payloadFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box02.qss"));
 
     // Buttons
-    Switch *_switch = new Switch(parent->m_kourou->autoInjectPayload ? true : false, 70);
+    Switch *_switch = new Switch(parent->userSettings->value("autoInject").toBool() ? true : false, 50);
     ui->horizontalLayout->addWidget(_switch);
     connect(_switch, SIGNAL(clicked()), this, SLOT(on_autoInject_toggled()));
     //ui->injectPayloadBtn->setCursor(Qt::PointingHandCursor);

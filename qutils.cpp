@@ -85,7 +85,7 @@ void Switch::paintEvent(QPaintEvent *e) {
     }
 }
 
-void Switch::toggle(bool state)
+void Switch::toggle()
 {
     int toffset = offset();
     _switch = _switch ? false : true;
@@ -105,7 +105,7 @@ void Switch::toggle(bool state)
 
 void Switch::mouseReleaseEvent(QMouseEvent *e) {
     if (e->button() & Qt::LeftButton) {
-        toggle(_switch);
+        toggle();
     }
     QAbstractButton::mouseReleaseEvent(e);
 }

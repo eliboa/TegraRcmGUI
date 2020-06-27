@@ -108,8 +108,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>50</y>
+      <x>270</x>
+      <y>46</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -128,9 +128,9 @@ color: rgb(255, 255, 255);</string>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>360</x>
       <y>40</y>
-      <width>71</width>
+      <width>51</width>
       <height>31</height>
      </rect>
     </property>

@@ -42,8 +42,9 @@ public:
     }
 
     bool isActive() { return _switch; }
+    bool getState() { return _switch; }
     void setState(bool value) {  _switch = value; }
-    void toggle(bool state);
+    void toggle();
 
 protected:
     void paintEvent(QPaintEvent*) override;

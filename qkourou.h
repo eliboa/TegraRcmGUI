@@ -38,6 +38,8 @@ private:
     TegraRcmGUI *m_gui;
     bool m_locked = false;
     bool m_force_lock = false;
+    bool m_askForDriverInstall = true;
+    bool m_APX_device_reconnect = true;
     QWidget *parent;
     std::string tmp_string;
     void hack(const char* payload_path, u8 *payload_buff, u32 buff_size);
@@ -54,14 +56,17 @@ public slots:
     void getDeviceInfo();
     void hack(const char* payload_path);
     void hack(u8 *payload_buff, u32 buff_size);
-
+    void initNoDriverDeviceLookUpLoop();
+    void noDriverDeviceLookUp();
+    void setAutoRcmEnabled(bool state);
 
 signals:
     void clb_deviceInfo(UC_DeviceInfo di);
     void clb_error(int error);
     void clb_deviceStateChange();
     void clb_finished(int res);
-
+    void clb_driverMissing();
+    void pushMessage(QString);
 };
 
 #endif // QKOUROU_H

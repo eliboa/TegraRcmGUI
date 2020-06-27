@@ -527,6 +527,8 @@ void on_RebootRCMCommand()
 		clock_halt_bpmp();
 }
 
+
+
 bool get_autoRCM_state(bool *state)
 {
     if(!initialize_mount(NULL, 1))
@@ -600,6 +602,12 @@ bool set_autoRCM_state(bool autoRCM)
     return true;
 }
 
+void on_setAutoRcmCommand(bool state)
+{
+    bool res = set_autoRCM_state(state);
+    send_response((const void*)&res, sizeof(bool)); // Notify caller
+}
+
 void on_getDeviceInfoCommand(FATFS *fs)
 {
     // Init a device info struct
@@ -636,10 +644,8 @@ void on_getDeviceInfoCommand(FATFS *fs)
         di.emmc_fs_type = fs->fs_type;
         di.emmc_fs_cl_size = fs->csize;
         di.emmc_fs_last_cl = fs->n_fatent - 2;
-        printk("di.emmc_fs_last_cl = %lu\n", emmc_fs_last_cl);
         FATFS *ffs;
         f_getfree("", &di.emmc_fs_free_cl, &ffs);
-        printk("di.emmc_fs_free_cl = %lu\n", di.emmc_fs_free_cl);
         FILINFO fno;
         di.cfw_sxos = (f_stat("boot.dat", &fno) == FR_OK);
         di.cbl_hekate = (f_stat("bootloader/hekate_ipl.ini", &fno) == FR_OK);
@@ -753,18 +759,21 @@ int main(void)
                 break;
             case WRITE_SD_FILE :
                 on_WriteSDFileCommand();
-                break;
-            
+                break;            
             case PUSH_PAYLOAD :
                 on_PushPayloadCommand();
-                break;
-                
+                break;                
             case REBOOT_RCM :
                 on_RebootRCMCommand();
                 break;
-
             case GET_DEVICE_INFO:
                 on_getDeviceInfoCommand(&fs);
+                break;
+            case SET_AUTORCM_ON:
+                on_setAutoRcmCommand(true);
+                break;
+            case SET_AUTORCM_OFF:
+                on_setAutoRcmCommand(false);
                 break;
         }
     }

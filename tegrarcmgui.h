@@ -6,11 +6,14 @@
 #include <QtConcurrent/QtConcurrent>
 #include "qpayload.h"
 #include "qtools.h"
+#include "qsettings.h"
 #include "kourou/kourou.h"
 #include "kourou/usb_command.h"
 #include "qkourou.h"
 
 class QPayloadWidget;
+class qTools;
+class qSettings;
 class QKourou;
 
 QT_BEGIN_NAMESPACE
@@ -36,7 +39,9 @@ public:
     QKourou *m_kourou;
     QPayloadWidget *payloadTab;
     qTools *toolsTab;
+    qSettings *settingsTab;
     bool enableWidget(QWidget *widget, bool enable);
+    bool isDeviceInfoAvailable() { return m_deviceInfoAvailable; }
 
 private slots:
     void on_deviceInfo_received(UC_DeviceInfo di);
@@ -58,8 +63,7 @@ signals:
 private:
     Ui::TegraRcmGUI *ui;
     KHOT_HANDLE m_hotHandle = nullptr;
-
-    bool m_ready = false;
+    bool m_deviceInfoAvailable = false;
     std::string tmp_string;
     QVector<qint64> push_ts;
     int tsToDeleteCount = 0;
@@ -80,5 +84,16 @@ const QString statusOffStyleSht("QFrame{border-radius: 10px; background-color: r
                                 "QLabel{font: 75 9pt \"Calibri\"; color: rgb(0, 0, 0);}");
 const QString statusOffRedStyleSht("QFrame{border-radius: 10px; background-color: rgb(150, 35, 0); border-color: rgb(0, 0, 0);}"
                                    "QLabel{font: 75 9pt \"Calibri\"; color: rgb(255, 255, 255);}");
+
+typedef struct ErrorLabel ErrorLabel;
+struct ErrorLabel {
+    int error;
+    QString label;
+};
+
+static ErrorLabel ErrorLabelArr[] =
+{
+    { FAILED_TO_SET_AUTORCM, "Failed to set autoRCM" },
+};
 
 #endif // TEGRARCMGUI_H

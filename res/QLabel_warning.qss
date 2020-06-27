@@ -1,0 +1,11 @@
+QFrame
+{
+    border-radius: 5px;
+    border:1px solid rgb(150, 35, 0);
+}
+
+QLabel
+{
+    font: 75 9pt "Calibri";
+    color: rgb(150, 35, 0);
+}

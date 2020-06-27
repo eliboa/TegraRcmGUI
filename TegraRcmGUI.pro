@@ -5,6 +5,7 @@ CONFIG += c++11
 
 RC_ICONS = res/TegraRcmGUI.ico
 
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -22,6 +23,7 @@ SOURCES += \
     main.cpp \
     qkourou.cpp \
     qpayload.cpp \
+    qsettings.cpp \
     qtools.cpp \
     qutils.cpp \
     tegrarcmgui.cpp
@@ -33,6 +35,7 @@ HEADERS += \
     kourou/usb_command.h \
     qkourou.h \
     qpayload.h \
+    qsettings.h \
     qtools.h \
     qutils.h \
     rcm_device.h \
@@ -41,14 +44,27 @@ HEADERS += \
 
 FORMS += \
     qpayload.ui \
+    qsettings.ui \
     qtools.ui \
     tegrarcmgui.ui
 
 TRANSLATIONS = languages/tegrarcmgui_fr.ts
 
-LIBS += -L$$PWD/../../../../../../../libusbK-dev-kit/bin/lib/amd64/ -llibusbK
+ARCH = 32
+#ARCH = 64
+
+contains( ARCH, 64 ) {
+    LIBS += -L$$PWD/../../../../../../../libusbK-dev-kit/bin/lib/amd64/ -llibusbK
+}
+contains( ARCH, 32 ) {
+    LIBS += -L$$PWD/../../../../../../../libusbK-dev-kit/bin/lib/x86/ -llibusbK
+}
 INCLUDEPATH += $$PWD/../../../../../../../libusbK-dev-kit/includes
 DEPENDPATH += $$PWD/../../../../../../../libusbK-dev-kit/includes
+
+
+
+LIBS += -lsetupapi
 
 RESOURCES += \
     qresources.qrc

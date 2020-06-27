@@ -11,10 +11,11 @@ QKourou::QKourou(QWidget *parent, Kourou* device, TegraRcmGUI* gui) : QWidget(pa
     connect(this, SIGNAL(clb_error(int)), parent, SLOT(error(int)));
     connect(this, SIGNAL(clb_deviceStateChange()), parent, SLOT(on_deviceStateChange()));
     connect(this, SIGNAL(clb_finished(int)), parent, SLOT(on_Kourou_finished(int)));
+    connect(this, SIGNAL(pushMessage(QString)), parent, SLOT(pushMessage(QString)));
 }
 
 void QKourou::initDevice(bool silent, KLST_DEVINFO_HANDLE deviceInfo)
-{
+{    
     if (!waitUntilUnlock())
         return;
 
@@ -99,7 +100,7 @@ DWORD QKourou::autoInject()
 
 void QKourou::getDeviceInfo()
 {
-    qDebug() << "QKourou::getDeviceInfo() execute in " << QThread::currentThreadId();
+    //qDebug() << "QKourou::getDeviceInfo() execute in " << QThread::currentThreadId();
 
     if (!waitUntilUnlock())
         return;
@@ -115,6 +116,19 @@ void QKourou::getDeviceInfo()
     else
         emit clb_deviceInfo(di);
 
+}
+
+void QKourou::setAutoRcmEnabled(bool state)
+{
+    if (!waitUntilUnlock())
+        return;
+
+    setLockEnabled(true);
+    bool res = m_device->setAutoRcmEnabled(state);
+    setLockEnabled(false);
+
+    if (!res)
+        emit clb_error(FAILED_TO_SET_AUTORCM);
 }
 
 void QKourou::hack(const char* payload_path, u8 *payload_buff, u32 buff_size)
@@ -193,7 +207,6 @@ bool QKourou::waitUntilRcmReady(uint timeout_s)
     return true;
 }
 
-
 bool QKourou::waitUntilInit(uint timeout_s)
 {
     qint64 begin_timestamp = QDateTime::currentSecsSinceEpoch();
@@ -203,4 +216,63 @@ bool QKourou::waitUntilInit(uint timeout_s)
             return false;
     }
     return true;
+}
+
+void QKourou::initNoDriverDeviceLookUpLoop()
+{
+    connect(this, SIGNAL(clb_driverMissing()), m_gui->settingsTab, SLOT(on_driverMissing()));
+    QTimer *lookup = new QTimer(this);
+    connect(lookup, SIGNAL(timeout()), this, SLOT(noDriverDeviceLookUp()));
+    lookup->start(1000); // Every second
+    m_askForDriverInstall = true;
+    m_APX_device_reconnect = true;
+}
+
+void QKourou::noDriverDeviceLookUp()
+{
+    if (m_device->getStatus() == CONNECTED)
+        return;
+
+    unsigned index;
+    HDEVINFO hDevInfo;
+    SP_DEVINFO_DATA DeviceInfoData;
+    TCHAR HardwareID[1024];
+    bool found = false;
+    // List all connected USB devices
+    hDevInfo = SetupDiGetClassDevs(nullptr, TEXT("USB"), nullptr, DIGCF_PRESENT | DIGCF_ALLCLASSES);
+    for (index = 0; ; index++)
+    {
+        DeviceInfoData.cbSize = sizeof(DeviceInfoData);
+        if (!SetupDiEnumDeviceInfo(hDevInfo, index, &DeviceInfoData))
+            break;
+
+        SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_HARDWAREID, nullptr, (BYTE*)HardwareID, sizeof(HardwareID), nullptr);
+        if (_tcsstr(HardwareID, _T("VID_0955&PID_7321")))
+        {
+            // device found, check driver
+            BYTE driverPath[256], zeroBuffer[256];
+            memset(driverPath, 0, 256);
+            memset(zeroBuffer, 0, 256);
+            SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_DRIVER, nullptr, driverPath, 256, nullptr);
+            if (!memcmp(driverPath, zeroBuffer, 256))
+            {
+                found = true;
+                // Driver not found
+                if (!m_askForDriverInstall)
+                {
+                    if (m_APX_device_reconnect)
+                        emit pushMessage(tr("Device detected but driver is missing\nInstall driver from SETTINGS tab"));
+                }
+                else
+                {
+                    emit clb_driverMissing();
+                    m_askForDriverInstall = false;
+                }
+                m_APX_device_reconnect = false;
+            }
+            break;
+        }
+    }
+    if (!found)
+        m_APX_device_reconnect = true;
 }

@@ -1,0 +1,5 @@
+QLabel
+{
+    font: 75 10pt "Rubik";
+    color: rgb(0, 150, 136);
+}

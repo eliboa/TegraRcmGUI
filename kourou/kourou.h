@@ -29,7 +29,8 @@ typedef enum _KRESULT : DWORD
 {
     RCM_REBOOT_FAILED       = 0x00F,
     ARIANE_NOT_READY        = 0x010,
-    WRONG_PARAM_GENERIC     = 0x011
+    WRONG_PARAM_GENERIC     = 0x011,
+    FAILED_TO_SET_AUTORCM   = 0x012
 
 } KRESULT;
 
@@ -48,6 +49,7 @@ public:
     bool arianeIsReady_sync();
     void setArianeReady(bool b) { m_ariane_ready = b; }
     bool rebootToRcm();
+    bool setAutoRcmEnabled(bool state);
 
 private:
     int sendBinPackets(char* buffer, u32 len);

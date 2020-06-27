@@ -13,6 +13,11 @@ QToolTip
     background-color: rgb(30, 30, 30);
     color: rgb(255, 255, 255);
 }
-QMessageBox QLabel {
+QMessageBox QLabel
+{
     color: rgb(0, 0, 0);
+}
+QLabel
+{
+    color: rgb(255, 255, 255);
 }

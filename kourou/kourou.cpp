@@ -199,3 +199,22 @@ bool Kourou::rebootToRcm()
 
     return response;
 }
+
+bool Kourou::setAutoRcmEnabled(bool state)
+{
+    if (!arianeIsReady_sync())
+        return false;
+
+    UC_Header uc;
+    uc.command = state ? SET_AUTORCM_ON : SET_AUTORCM_OFF;
+    // Send command
+    write((const u8*)&uc, sizeof(uc));
+
+    // Get response
+    bool response = false;
+    if (!readResponse(&response, sizeof(bool)))
+        return false;
+
+    return response;
+
+}

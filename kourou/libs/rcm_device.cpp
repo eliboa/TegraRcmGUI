@@ -46,12 +46,19 @@ bool RcmDevice::initDevice(KLST_DEVINFO_HANDLE deviceInfo)
         return false;
     };
 
+    // Load driver API
+    if (!m_usbAPI_loaded)
+    {
+        LibK_LoadDriverAPI(&m_usbApi, KUSB_DRVID_LIBUSBK);
+        m_usbAPI_loaded = true;
+    }
+
     if (deviceInfo != nullptr && (deviceInfo->Common.Vid != RCM_VID && deviceInfo->Common.Pid != RCM_PID))
         return error(WRONG_DEVICE_VID_PID);
 
     KLST_DEVINFO_HANDLE tmp_devInfo = deviceInfo != nullptr ? deviceInfo : m_devInfo;
     if(tmp_devInfo == nullptr && !getPluggedDevice(&tmp_devInfo))
-        return error(DEVICE_NOT_FOUND);
+            return error(DEVICE_NOT_FOUND);
 
     // New device already initialized & connected, return ready state (no need to load anything else)
     if (m_devInfo != nullptr && m_devStatus == CONNECTED && m_devInfo->DeviceID == tmp_devInfo->DeviceID)
@@ -62,14 +69,7 @@ bool RcmDevice::initDevice(KLST_DEVINFO_HANDLE deviceInfo)
     m_devIsInitialized = false;
 
     if (m_devInfo->DriverID != KUSB_DRVID_LIBUSBK)
-        return error(MISSING_LIBUSBK_DRIVER);
-
-    // Load driver API
-    if (!m_usbAPI_loaded)
-    {
-        LibK_LoadDriverAPI(&m_usbApi, KUSB_DRVID_LIBUSBK);
-        m_usbAPI_loaded = true;
-    }
+        return error(MISSING_LIBUSBK_DRIVER);   
 
     // Init USB handle
     m_usbApi.Free(m_usbHandle); // Free previous usb handle
