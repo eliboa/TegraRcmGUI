@@ -1,3 +1,10 @@
+![Png](https://img.shields.io/badge/platform-windows-lightgrey)
+![Png](https://img.shields.io/badge/latest%20stable%20release-2.6-yellow)
+![GitHub](https://img.shields.io/github/license/eliboa/TegraRcmGUI)
+![GitHub All Releases](https://img.shields.io/github/downloads/eliboa/TegraRcmGUI/total)
+![GitHub repo size](https://img.shields.io/github/repo-size/eliboa/TegraRcmGUI)
+![GitHub issues](https://img.shields.io/github/issues/eliboa/TegraRcmGUI)
+
 # TegraRcmGUI
 C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajkosto](https://github.com/rajkosto) (Fusée Gelée exploit for Nintendo Switch)
   
