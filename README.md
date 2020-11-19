@@ -26,7 +26,7 @@ I'm also looking for beta-testers, so if you're willing to help, please send me 
 - Option - Run app at Windows startup 
 - Install APX device driver (if needed)
 
-![Png](http://laumonier.org/TegraRcmGUI_v2.5.png)
+![Png](https://www.eliboa.com/TegraRcmGUI_v2.5.png)
 
 ## Download
 [Latest release](https://github.com/eliboa/TegraRcmGUI/releases/latest) (Windows)
@@ -48,7 +48,7 @@ Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report 
  2) Download and open [NxNandManager](https://github.com/eliboa/NxNandManager). Select "File" then "Open drive".   
  3) Select the mounted drive. You can now perform backup/restore operations.   
 
-![Png](http://laumonier.org/switch/NxNandManager_v1.1_howto_open_drive.png)   
+![Png](https://www.eliboa.com/NxNandManager_v1.1_howto_open_drive.png)   
 
 ## Credits
 - [Rajkosto](https://github.com/rajkosto) / [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) (Fusée Launcher reimplementation for Windows), [memloader](https://github.com/rajkosto/memloader), SD tool, [biskeydump](https://github.com/rajkosto/biskeydump)
