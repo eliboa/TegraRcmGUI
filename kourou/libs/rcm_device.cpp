@@ -91,7 +91,7 @@ bool RcmDevice::initDevice(KLST_DEVINFO_HANDLE deviceInfo)
     m_devStatus = CONNECTED;
 
     // Set pipes timeout policy
-    u32 pipe_timeout = 2000; //ms
+    u32 pipe_timeout = 2500; //ms
     m_usbApi.SetPipePolicy(m_usbHandle, READ_PIPE_ID, PIPE_TRANSFER_TIMEOUT, sizeof(u32), &pipe_timeout);
     m_usbApi.SetPipePolicy(m_usbHandle, WRITE_PIPE_ID, PIPE_TRANSFER_TIMEOUT, sizeof(u32), &pipe_timeout);
 
@@ -133,7 +133,7 @@ int RcmDevice::read(u8* buffer, size_t bufferSize)
 
 int RcmDevice::write(const u8* buffer, size_t bufferSize)
 {
-    size_t bytesRemaining = int(bufferSize);
+    size_t bytesRemaining = bufferSize;
     size_t bytesWritten = 0;
 
     while (bytesRemaining > 0)
@@ -174,34 +174,6 @@ const byte BUILTIN_INTERMEZZO[] =
     0x5C, 0xF0, 0x01, 0x40, 0x00, 0x00, 0x02, 0x40, 0x00, 0x00, 0x01, 0x40
 };
 
-RRESULT RcmDevice::hack(const char* user_payload_path)
-{
-    ifstream userPayload(user_payload_path, ios::in | ios::binary | ios::ate);
-
-    if (!userPayload.is_open())
-        return OPEN_FILE_FAILED;
-
-    const auto userPayloadSize = int(userPayload.tellg());
-    if (userPayloadSize > PAYLOAD_MAX_SIZE)
-        return PAYLOAD_TOO_LARGE;
-
-    userPayload.seekg(0, ios::beg);
-    char *userPayloadBuffer = new char[userPayloadSize];
-    userPayload.read(&userPayloadBuffer[0], userPayloadSize);
-    bool error = !(userPayload) || int(userPayload.tellg()) != userPayloadSize;
-    userPayload.close();
-    if (error)
-    {
-        delete[] userPayloadBuffer;
-        return OPEN_FILE_FAILED;
-    }
-
-    RRESULT res = hack((u8*)userPayloadBuffer, (u32)userPayloadSize);
-
-    delete[] userPayloadBuffer;
-    return res;
-}
-
 RRESULT RcmDevice::hack(u8 *payload_buff, u32 buff_size)
 {
     if (!m_devIsInitialized)
@@ -216,7 +188,7 @@ RRESULT RcmDevice::hack(u8 *payload_buff, u32 buff_size)
 
     m_currentBuffer = 0;
 
-    // Read device id first.
+    // Read device's id first.
     vector<u8> deviceId(0x10, 0);
     if (read(&deviceId[0], 0x10) != int(deviceId.size()))
         return DEVICE_NOT_READY;
@@ -272,24 +244,22 @@ RRESULT RcmDevice::hack(u8 *payload_buff, u32 buff_size)
     else
         payload.resize(PAYLOAD_TOTAL_MAX_SIZE);
 
-    int test = int(payload.size());
-
     // Send the constructed payload, which contains the command, the stack smashing values,
     // the Intermezzo relocation stub, and the user payload.
     int bytesWritten = write(&payload[0], payload.size());
-    if (bytesWritten < payload.size())
+    if (bytesWritten < int(payload.size()))
         return USB_WRITE_FAILED;
 
     // The RCM backend alternates between two different DMA buffers. Ensure we're about to DMA
     // into the higher one, so we have less to copy during our attack.
     // Warning! If device reboot to RCM, resetCurrentBuffer() must be called otherwise we'll swith to lower buffer instead
-    u32 sres = switchToHighBuffer();
+    int sres = switchToHighBuffer();
     if (sres != 0 && (sres < 0 || sres != PACKET_SIZE))
         return SW_HIGHBUFF_FAILED;
 
     // Finally, to trigger the memcpy vulnerability itself, we need to send a
     // long length "GET_STATUS" request to the endpoint
-    int stLength = RCM_PAYLOAD_ADDR - getCurrentBufferAddress();
+    auto stLength = RCM_PAYLOAD_ADDR - getCurrentBufferAddress();
     std::vector<byte> threshBuf(stLength, 0);    
     libusbk::libusb_request req;
     memset(&req, 0, sizeof(req));
@@ -299,12 +269,41 @@ RRESULT RcmDevice::hack(u8 *payload_buff, u32 buff_size)
 
     // Request device
     int res = Ioctl(libusbk::LIBUSB_IOCTL_GET_STATUS, &req, sizeof(req), &threshBuf[0], threshBuf.size());
+
     // If stack is smashed, the request will timeout
     // If the device is an ipatched unit or Mariko+, the request will likely return 0 (or < 0)
     if (res <= 0 && -res != ERROR_SEM_TIMEOUT)
         return STACK_SMASH_FAILED;
     else
         return SUCCESS;
+}
+
+RRESULT RcmDevice::hack(const char* user_payload_path)
+{
+    ifstream userPayload(user_payload_path, ios::in | ios::binary | ios::ate);
+
+    if (!userPayload.is_open())
+        return OPEN_FILE_FAILED;
+
+    const auto userPayloadSize = int(userPayload.tellg());
+    if (userPayloadSize > PAYLOAD_MAX_SIZE)
+        return PAYLOAD_TOO_LARGE;
+
+    userPayload.seekg(0, ios::beg);
+    char *userPayloadBuffer = new char[userPayloadSize];
+    userPayload.read(&userPayloadBuffer[0], userPayloadSize);
+    bool error = !(userPayload) || int(userPayload.tellg()) != userPayloadSize;
+    userPayload.close();
+    if (error)
+    {
+        delete[] userPayloadBuffer;
+        return OPEN_FILE_FAILED;
+    }
+
+    RRESULT res = hack((u8*)userPayloadBuffer, (u32)userPayloadSize);
+
+    delete[] userPayloadBuffer;
+    return res;
 }
 
 ////////////////////////////////////////////
@@ -359,6 +358,7 @@ int RcmDevice::Ioctl(DWORD ioctlCode, const void* inputBytes, size_t numInputByt
 
     return int(bytesReceived);
 }
+
 // Switch to higher DMA buffer
 int RcmDevice::switchToHighBuffer()
 {
@@ -368,9 +368,6 @@ int RcmDevice::switchToHighBuffer()
         memset(tempZeroDatas, 0, sizeof(tempZeroDatas));
 
         const auto writeRes = write(tempZeroDatas, sizeof(tempZeroDatas));
-        if (writeRes < 0)
-            return writeRes;
-
         return writeRes;
     }
     else return 0;

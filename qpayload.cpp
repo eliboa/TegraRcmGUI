@@ -1,12 +1,9 @@
+
 #include <QDebug>
 #include "qpayload.h"
 #include "ui_qpayload.h"
 #include "qutils.h"
-
-/////////////////////////////////////////////////////////////
-/// \brief QPayloadWidget::QPayloadWidget
-/// \param parent
-/////////////////////////////////////////////////////////////
+#include "qobjects/custombutton.h"
 
 QPayloadWidget::QPayloadWidget(TegraRcmGUI *parent) : QWidget(parent)
   , ui(new Ui::QPayloadWidget), parent(parent)
@@ -38,52 +35,38 @@ QPayloadWidget::QPayloadWidget(TegraRcmGUI *parent) : QWidget(parent)
         item.at(i)->setStatusTip("test");
     }
 
-
-    // Timers
-    QTimer *payloadBtnStatus_timer = new QTimer(this);
-    connect(payloadBtnStatus_timer, SIGNAL(timeout()), this, SLOT(payloadBtnStatusTimer()));
-    payloadBtnStatus_timer->start(1000); // Every second
-
-
-
-    /// Stylesheets
-    // Apply stylesheet to all buttons
-    QString btnSs = GetStyleSheetFromResFile(":/res/QPushButton.qss");
-    auto buttons = this->findChildren<QPushButton*>();
-    for (int i = 0; i < buttons.count(); i++)
-    {
-        buttons.at(i)->setStyleSheet(btnSs);
-        buttons.at(i)->setCursor(Qt::PointingHandCursor);
-
-    }
+    // Stylesheets
     this->setStyleSheet(GetStyleSheetFromResFile(":/res/QMainWindow.qss"));
     ui->payload_tableView->setStyleSheet(GetStyleSheetFromResFile(":/res/QTableView.qss"));
     ui->payloadFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box02.qss"));
+    ui->payloadPathLbl->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_title02.qss"));
+    ui->favoritesLbl->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_title02.qss"));
 
     // Buttons
     Switch *_switch = new Switch(parent->userSettings->value("autoInject").toBool() ? true : false, 50);
     ui->horizontalLayout->addWidget(_switch);
     connect(_switch, SIGNAL(clicked()), this, SLOT(on_autoInject_toggled()));
-    //ui->injectPayloadBtn->setCursor(Qt::PointingHandCursor);
-    //ui->browsePayloadBtn->setCursor(Qt::PointingHandCursor);
 
-    // ToolTip
+    auto *browseB = new CustomButton(parent, tr("Browse"), LIGHT);
+    browseB->setStatusTip(tr("Browse payload file from local file systems"));
+    browseB->setFixedSize(60, 20);
+    connect(browseB, &QPushButton::clicked, this, &QPayloadWidget::on_browsePayloadBtn_clicked);
+    ui->browsePayloadLayout->addWidget(browseB);
+
+    auto *injectB = new CustomButton(parent, tr("INJECT PAYLOAD"));
+    injectB->setStatusTip(tr("Inject current payload to device"));
+    injectB->addEnableCondition(C_READY_FOR_PAYLOAD);
+    injectB->setFixedSize(100, 30);
+    connect(injectB, &QPushButton::clicked, this, &QPayloadWidget::on_injectPayloadBtn_clicked);
+    ui->injectPayloadLayout->addWidget(injectB);
+
+    // Tool tips
     ui->addFavoriteBtn->setStatusTip(tr("Add current payload selection to favorites"));
     ui->deleteFavoriteBtn->setStatusTip(tr("Remove selected item from favorites (payload file will not be deleted)"));
 
-    QString ppath = parent->userSettings->value("autoInjectPath").toString();
-    ui->payload_path->setText(ppath);
+    ui->payload_path->setText(parent->userSettings->value("autoInjectPath").toString());
+}
 
-}
-void QPayloadWidget::payloadBtnStatusTimer()
-{
-    qint64 time = QDateTime::currentSecsSinceEpoch();
-    if (payloadBtnStatusLbl_time && (time + 5 > payloadBtnStatusLbl_time))
-    {
-        ui->payloadBtnStatusLbl->setText("");
-        payloadBtnStatusLbl_time = 0;
-    }
-}
 void QPayloadWidget::on_browsePayloadBtn_clicked()
 {
     QString path = FileDialog(this, open_file).toLocal8Bit();
@@ -91,21 +74,18 @@ void QPayloadWidget::on_browsePayloadBtn_clicked()
         ui->payload_path->setText(path);
 }
 
+void QPayloadWidget::on_injectPayload(QString payload_path)
+{
+    ui->payload_path->setText(payload_path);
+    on_injectPayloadBtn_clicked();
+}
+
 void QPayloadWidget::on_injectPayloadBtn_clicked()
 {
-    if (!m_device->rcmIsReady() && !m_device->arianeIsReady())
-        return;
-
-    if (payloadBtnLock)
-    {
-        ui->payloadBtnStatusLbl->setText(tr("Work in progress"));
-        payloadBtnStatusLbl_time = QDateTime::currentSecsSinceEpoch();
-        return;
-    }
-
     QFile file(ui->payload_path->text().toLocal8Bit().constData());
     if (!file.open(QIODevice::ReadOnly))
         return parent->error(0x005);
+
     if (file.size() > PAYLOAD_MAX_SIZE)
     {
         file.close();
@@ -113,9 +93,7 @@ void QPayloadWidget::on_injectPayloadBtn_clicked()
     }
     file.close();
 
-    tmp_string.clear();
-    tmp_string.append(ui->payload_path->text().toStdString());
-    payloadBtnLock = true;
+    tmp_string = ui->payload_path->text().toStdString();
     QtConcurrent::run(m_kourou, &QKourou::hack, tmp_string.c_str());
 }
 
@@ -123,21 +101,11 @@ void QPayloadWidget::on_deviceStateChange()
 {
     if ((m_device->rcmIsReady() && !m_kourou->autoLaunchAriane) || m_device->arianeIsReady())
     {
-        payloadBtnLock = false;
-        ui->injectPayloadBtn->setCursor(Qt::PointingHandCursor);
-        ui->injectPayloadBtn->setStatusTip("Inject current payload to device");
         if (m_payloadModel->rowCount())
             ui->payload_tableView->setStatusTip(tr("Double-click to inject payload"));
     }
     else
     {
-        payloadBtnLock = true;
-        QString tip = m_device->getStatus() == CONNECTED ? tr("RCM device is not ready. Reboot to RCM") : tr("RCM device undetected!");
-        if (m_kourou->arianeIsLoading)
-            tip = tr("Wait for Ariane to be fully loaded");
-        //ui->injectPayloadBtn->setToolTip(tip);
-        ui->injectPayloadBtn->setStatusTip(tip);
-        ui->injectPayloadBtn->setCursor(Qt::ForbiddenCursor);
         if (m_payloadModel->rowCount())
             ui->payload_tableView->setStatusTip(tr("Double-click to push favorite into current selection"));
     }
@@ -145,19 +113,23 @@ void QPayloadWidget::on_deviceStateChange()
 
 bool QPayloadWidget::addFavorite(QString name, QString path)
 {
-    QFile file(path);
 
+    if (m_payloadModel->getPayloads().contains({ path, name }))
+        return true; // Already in favorites, return true
+
+    QFile file(path);
     if (!file.exists())
         return false;
 
     if (!m_payloadModel->getPayloads().contains({ name, path }))
     {
         m_payloadModel->insertRows(0, 1, QModelIndex());
-        QModelIndex index = m_payloadModel->index(0, 0, QModelIndex());
+        auto index = m_payloadModel->index(0, 0, QModelIndex());
         m_payloadModel->setData(index, name, Qt::EditRole);
         index = m_payloadModel->index(0, 1, QModelIndex());
         m_payloadModel->setData(index, path, Qt::EditRole);
-        return true;
+
+        return writeFavoritesToFile();
     }
     return false;
 }
@@ -186,8 +158,6 @@ void QPayloadWidget::on_addFavoriteBtn_clicked()
         return;
     }
 
-    if(addFavorite(name, path))
-        writeFavoritesToFile();
 }
 
 void QPayloadWidget::on_deleteFavoriteBtn_clicked()
@@ -237,10 +207,9 @@ bool QPayloadWidget::readFavoritesFromFile()
     pFile.close();
 
     QJsonDocument loadDoc(QJsonDocument::fromJson(pData));
-
     QJsonObject json = loadDoc.object();
-
     QJsonArray pArray = json["favorites"].toArray();
+
     int i(0);
     for (i = 0; i < pArray.size(); i++)
     {
@@ -262,8 +231,8 @@ bool QPayloadWidget::writeFavoritesToFile()
         return false;
 
     QJsonArray pArray;
-    QVector<payload_t> payloads = m_payloadModel->getPayloads();
-    for (payload_t paylaod : payloads)
+    auto payloads = m_payloadModel->getPayloads();
+    for (auto paylaod : payloads)
     {
         QJsonObject payloadEntry;
         payloadEntry["name"] = paylaod.name;
@@ -272,11 +241,8 @@ bool QPayloadWidget::writeFavoritesToFile()
     }
     QJsonObject json;
     json["favorites"] = pArray;
-    QJsonDocument saveDoc(json);
-    pFile.write(saveDoc.toJson());
-
+    pFile.write(QJsonDocument(json).toJson());
     pFile.close();
-
     return true;
 }
 
@@ -361,7 +327,6 @@ bool PayloadModel::setData(const QModelIndex &index, const QVariant &value, int 
 
         return true;
     }
-
     return false;
 }
 
@@ -381,7 +346,7 @@ const QVector<payload_t> &PayloadModel::getPayloads() const
 
 void QPayloadWidget::on_payload_tableView_doubleClicked(const QModelIndex &index)
 {
-    QString path = m_payloadModel->getPayloads().at(index.row()).path;
-    ui->payload_path->setText(path);
-    on_injectPayloadBtn_clicked();
+    ui->payload_path->setText(m_payloadModel->getPayloads().at(index.row()).path);
+    if (m_device->isReadyToReceivePayload())
+        on_injectPayloadBtn_clicked();
 }

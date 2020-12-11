@@ -1,0 +1,20 @@
+QPushButton
+{
+   background-color: rgba(255, 255, 255, 0);
+   color: rgb(160, 160, 160);
+   border-radius: 10px;
+   border: 1px solid rgb(160, 160, 160);
+   font: 75 8pt "Rubik";
+}
+QPushButton:pressed
+{
+    color: rgb(160, 160, 160);
+    background-color: rgba(255, 255, 255, 0);
+}
+QPushButton:hover
+{
+    color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 25);
+    border: 1px solid rgb(255, 255, 255);
+}
+

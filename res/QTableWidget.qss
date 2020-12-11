@@ -1,0 +1,21 @@
+QTableView
+{
+    gridline-color : rgb(120, 120, 120);
+    color: rgb(255, 255, 255);
+    alternate-background-color: rgb(255, 255, 255, 30);
+    background: rgb(255, 255, 255);
+    selection-background-color: rgb(30, 105, 98);
+    font: 8pt "Rubik";
+}
+
+QTableWidgetItem
+{
+    border: 0px;
+    height: 15px;
+}
+
+QFrame
+{
+    background-color: rgb(255, 255, 255, 0);
+    border-radius: 0px;
+}

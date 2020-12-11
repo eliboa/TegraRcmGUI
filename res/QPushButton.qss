@@ -3,6 +3,7 @@ QPushButton
    background-color: rgb(0, 150, 136);
    color: rgb(255, 255, 255);
    border-radius: 10px;
+   font: 75 8pt "Rubik";
 }
 QPushButton:pressed
 {

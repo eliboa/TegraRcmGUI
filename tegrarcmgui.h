@@ -5,16 +5,24 @@
 #include <QSettings>
 #include <QtConcurrent/QtConcurrent>
 #include "qpayload.h"
+#include "qhekate.h"
 #include "qtools.h"
 #include "qsettings.h"
 #include "kourou/kourou.h"
 #include "kourou/usb_command.h"
 #include "qkourou.h"
+#include "qprogress_widget.h"
+#include "qobjects/custombutton.h"
+#include "packages.h"
+#include "packagemanager.h"
 
 class QPayloadWidget;
+class qHekate;
 class qTools;
 class qSettings;
 class QKourou;
+class qProgressWidget;
+class Packages;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class TegraRcmGUI; }
@@ -27,7 +35,7 @@ class TegraRcmGUI : public QMainWindow
     static TegraRcmGUI* m_instance;
 public:
     TegraRcmGUI(QWidget *parent = nullptr);
-    ~TegraRcmGUI();
+    ~TegraRcmGUI() override;
     static bool hasInstance() { return m_instance; }
     static TegraRcmGUI * instance() {
       if (!m_instance) m_instance = new TegraRcmGUI;
@@ -38,24 +46,30 @@ public:
     Kourou m_device;
     QKourou *m_kourou;
     QPayloadWidget *payloadTab;
+    qHekate *hekateTab;
     qTools *toolsTab;
     qSettings *settingsTab;
+    qProgressWidget *m_progressWidget = nullptr;
+    Packages m_pkgs;
+
     bool enableWidget(QWidget *widget, bool enable);
-    bool isDeviceInfoAvailable() { return m_deviceInfoAvailable; }
+    void changeEvent(QEvent* e) override;
 
 private slots:
     void on_deviceInfo_received(UC_DeviceInfo di);
     void on_autoLaunchAriane_toggled(bool value);
+    void updateAvailable();
     void pushTimer();
     void on_Kourou_finished(int res);
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void on_appClose();        
 
 public slots:
     void hotPlugEvent(bool added, KLST_DEVINFO_HANDLE deviceInfo);
     void deviceInfoTimer();
     void error(int error);
     void on_deviceStateChange();
-    void pushMessage(QString message);
+    void pushMessage(const QString message);    
 
 signals:
     void sign_hotPlugEvent(bool added, KLST_DEVINFO_HANDLE);
@@ -63,7 +77,6 @@ signals:
 private:
     Ui::TegraRcmGUI *ui;
     KHOT_HANDLE m_hotHandle = nullptr;
-    bool m_deviceInfoAvailable = false;
     std::string tmp_string;
     QVector<qint64> push_ts;
     int tsToDeleteCount = 0;
@@ -72,7 +85,7 @@ private:
     const QIcon switchOnIcon = QIcon(":/res/switch_logo_on.png");
     const QIcon switchOffIcon = QIcon(":/res/switch_logo_off.png");
     QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
+    QMenu *trayIconMenu = nullptr;
     void drawTrayContextMenu();
 
     void clearDeviceInfo();

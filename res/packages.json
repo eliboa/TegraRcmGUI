@@ -1,0 +1,38 @@
+{
+    "packages": [        
+        {
+            "name": "Ariane",
+            "version": "1.0.0",
+            "type": "Payload",
+            "author": "eliboa",
+            "description": "Communicate with device through USB",
+            "payload": ":/ariane_bin"
+        },
+        {
+            "name": "Hekate",
+            "version": "5.3.4",
+            "type": "Bootloader",
+            "author": "CTCaer",
+            "description": "The all in one bootloader for all your needs",
+            "url": "https://github.com/CTCaer/hekate",
+            "payload": "packages/Hekate/5.3.4/hekate_ctcaer_5.3.4.bin"
+        },
+        {
+            "name": "Atmosphere",
+            "version": "0.14.4",
+            "author": "SciresM,...",
+            "description": "Customized firmware for the Nintendo Switch",
+            "url": "https://github.com/Atmosphere-NX/Atmosphere",
+            "type": "CFW"
+        },
+        {
+            "name": "Lockpick_RCM",
+            "type": "Payload",
+            "version": "1.8.4",
+            "author": "shchmue",
+            "description": "Derives encryption keys",
+            "url": "https://github.com/shchmue/Lockpick_RCM",
+            "payload": "packages/Lockpick_RCM/1.8.4/Lockpick_RCM.bin"
+        }
+    ]
+}

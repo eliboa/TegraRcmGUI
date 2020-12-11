@@ -135,7 +135,7 @@ public:
     bool flushPipe(UCHAR pipeId) { return m_usbApi.FlushPipe(m_usbHandle, pipeId); }
 
     // Reset the current buffer to lower one. Use this with caution.
-    // Current buffer should not be reset manually, except after a controlled RCM reboot er disconnection.
+    // Current buffer should not be reset manually, except after a controlled RCM reboot or disconnection.
     // disconnect() method should be preferred
     void resetCurrentBuffer() { m_currentBuffer = 0; }
 

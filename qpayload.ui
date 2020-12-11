@@ -60,8 +60,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">
-</string>
+    <string notr="true"/>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
@@ -69,22 +68,6 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QPushButton" name="browsePayloadBtn">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>10</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string>Browse</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
@@ -93,10 +76,6 @@
       <width>50</width>
       <height>20</height>
      </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 10pt &quot;Calibri&quot;;
-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string>Path:</string>
@@ -113,10 +92,6 @@ color: rgb(255, 255, 255);</string>
       <width>81</width>
       <height>16</height>
      </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 10pt &quot;Calibri&quot;;
-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string>Auto inject:</string>
@@ -135,22 +110,6 @@ color: rgb(255, 255, 255);</string>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout"/>
-   </widget>
-   <widget class="QPushButton" name="injectPayloadBtn">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>101</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string>INJECT PAYLOAD</string>
-    </property>
    </widget>
    <widget class="QLineEdit" name="payload_path">
     <property name="geometry">
@@ -171,24 +130,27 @@ color: rgb(255, 255, 255);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="payloadBtnStatusLbl">
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>45</y>
-      <width>131</width>
+      <x>10</x>
+      <y>40</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="injectPayloadLayout"/>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>10</y>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="styleSheet">
-     <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
+    <layout class="QHBoxLayout" name="browsePayloadLayout"/>
    </widget>
   </widget>
   <widget class="QLabel" name="payloadPathLbl">
@@ -201,8 +163,7 @@ color: rgb(255, 255, 255);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font: 11pt &quot;Calibri&quot;;
-</string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Payload selection:</string>
@@ -261,8 +222,7 @@ color: rgb(255, 255, 255);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font: 11pt &quot;Calibri&quot;;
-</string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Favorites:</string>

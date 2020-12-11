@@ -15,6 +15,8 @@ using s32 = std::int32_t;
 using s16 = std::int16_t;
 using s8 = std::int8_t;
 
+using Bytes = std::vector<u8>;
+
 using std::vector;
 using std::string;
 using std::array;

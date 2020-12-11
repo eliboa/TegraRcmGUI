@@ -1,0 +1,11 @@
+QLabel
+{
+    font: 75 8pt "Rubik";
+    padding: 5px;
+    color: rgb(255, 255, 255);    
+    background-color: rgb(41, 41, 41);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 0px;
+}

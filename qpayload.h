@@ -63,6 +63,8 @@ public:
     std::string tmp_string;
     const QVector<payload_t> &getPayloads() const { return m_payloadModel->getPayloads(); }
 
+    bool addFavorite(QString name, QString path);
+
 private:
     Ui::QPayloadWidget *ui;
     PayloadModel *m_payloadModel;
@@ -70,10 +72,8 @@ private:
     TegraRcmGUI *parent;
     QKourou *m_kourou;
     Kourou *m_device;
-    qint64 payloadBtnStatusLbl_time = 0;
-    bool payloadBtnLock = false;
 
-    bool addFavorite(QString name, QString path);
+
     bool readFavoritesFromFile();
     bool writeFavoritesToFile();
 
@@ -81,6 +81,7 @@ signals:
 
 public slots:
     void on_deviceStateChange();
+    void on_injectPayload(QString payload_path);
 
 private slots:
     void on_browsePayloadBtn_clicked();
@@ -88,8 +89,6 @@ private slots:
     void on_addFavoriteBtn_clicked();
     void on_deleteFavoriteBtn_clicked();
     void on_autoInject_toggled();
-    void payloadBtnStatusTimer();
-
     void on_payload_path_textChanged(const QString &arg1);
 
     void on_payload_tableView_doubleClicked(const QModelIndex &index);

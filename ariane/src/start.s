@@ -1,72 +1,77 @@
-.macro CLEAR_GPR_REG_ITER
-    mov r\@, #0
-.endm
+/*
+* Copyright (c) 2018 naehrwert
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms and conditions of the GNU General Public License,
+* version 2, as published by the Free Software Foundation.
+*
+* This program is distributed in the hope it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-.section .text.start
+.section .text._start
 .arm
-.align 5
-.global _start
+
+.extern _reloc_ipl
+.type _reloc_ipl, %function
+
+.extern memset
+.type memset, %function
+
+.extern _irq_setup
+.type _irq_setup, %function
+
+.globl _start
+.type _start, %function
 _start:
-    /* Insert NOPs for convenience (i.e. to use Nintendo's BCTs, for example) */
-    .rept 16
-    nop
-    .endr
-    /* Switch to supervisor mode, mask all interrupts, clear all flags */
-    msr cpsr_cxsf, #0xDF
+	ADR R0, _start
+	LDR R1, =__ipl_start
+	CMP R0, R1
+	BEQ _real_start
 
-    /* Relocate ourselves if necessary */
-    ldr r0, =__start__
-    adr r1, _start
-    cmp r0, r1
-    beq _after_relocation
+	/* If we are not in the right location already, copy a relocator to upper IRAM. */
+	ADR R2, _reloc_ipl
+	LDR R3, =0x4003FF00
+	MOV R4, #(_real_start - _reloc_ipl)
+_copy_loop:
+	LDMIA R2!, {R5}
+	STMIA R3!, {R5}
+	SUBS R4, #4
+	BNE _copy_loop
 
-    adr r2, _relocator
-    ldr r3, =__stack
-    adr r4, _relocator_end
-    mov r12, r3
-    _copy_relocator_loop:
-        ldr r5, [r2], #4
-        str r5, [r3], #4
-        cmp  r2, r4
-        bne _copy_relocator_loop
+	/* Use the relocator to copy ourselves into the right place. */
+	LDR R2, =__ipl_end
+	SUB R2, R2, R1
+	LDR R3, =_real_start
+	LDR R4, =0x4003FF00
+	BX R4
 
-    ldr r2, =__bss_start__
-    sub r2, r2, r0
-    bx  r12
+_reloc_ipl:
+	LDMIA R0!, {R4-R7}
+	STMIA R1!, {R4-R7}
+	SUBS R2, #0x10
+	BNE _reloc_ipl
+	/* Jump to the relocated entry. */
+	BX R3
 
-    _after_relocation:
-    /* Set the stack pointer */
-    ldr sp, =__stack
-    mov fp, #0
+_real_start:
+	/* Initially, we place our stack in IRAM but will move it to SDRAM later. */
+	LDR SP, =0x4003FF00
+	LDR R0, =__bss_start
+	EOR R1, R1, R1
+	LDR R2, =__bss_end
+	SUB R2, R2, R0
+	BL memset
+	BL _irq_setup
+	B .
 
-    /* Clear .bss */
-    ldr r0, =__bss_start__
-    mov r1, #0
-    ldr r2, =__bss_end__
-    sub r2, r2, r0
-    bl  memset
-
-    /* Call global constructors */
-    bl  __libc_init_array
-
-    /* Set r0 to r12 to 0 (because why not?) & call main */
-    .rept 13
-    CLEAR_GPR_REG_ITER
-    .endr
-    bl  main
-    b   .
-_relocator:
-    mov r12, r0
-    _relocation_loop:
-        ldmia r1!, {r3-r10}
-        stmia r0!, {r3-r10}
-        subs  r2, #0x20
-        bne _relocation_loop
-    bx  r12
-_relocator_end:
-    b   .
 .globl pivot_stack
 .type pivot_stack, %function
 pivot_stack:
 	MOV SP, R0
-	BX LR    
+	BX LR

@@ -15,5 +15,12 @@
         <file>res/add.ico</file>
         <file>res/QLabel_warning.qss</file>
         <file>res/QLabel_title02.qss</file>
+        <file>res/ProgressWidget.qss</file>
+        <file>res/loader_bg646464.gif</file>
+        <file>res/Badge_label.qss</file>
+        <file>res/Badge_value.qss</file>
+        <file>res/QPushButton_light.qss</file>
+        <file>res/QTableWidget.qss</file>
+        <file>res/packages.json</file>
     </qresource>
 </RCC>

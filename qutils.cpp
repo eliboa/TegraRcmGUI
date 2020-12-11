@@ -1,5 +1,62 @@
 #include "qutils.h"
 
+QString GetAppVersionAsQString(AppVersion version)
+{
+    QString s_ver = QString::number(version.major);
+    s_ver.append(".");
+    s_ver.append(QString::number(version.minor));
+    s_ver.append(".");
+    s_ver.append(QString::number(version.micro));
+    return s_ver;
+}
+
+Badge::Badge(QString label, QString value, QWidget* parent)
+{
+    m_hbl = new QHBoxLayout(this);
+    m_hbl->setMargin(0);
+    m_hbl->setSpacing(0);
+
+    m_hbl->setAlignment(Qt::AlignLeft);
+    m_l_label = new QLabel(label, this);
+    m_l_label->setFixedHeight(22);
+    m_l_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    m_l_label->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    m_l_label->setStyleSheet(GetStyleSheetFromResFile(":/res/Badge_label.qss"));
+
+    m_v_label = new QLabel(value, this);
+    m_v_label->setFixedHeight(22);
+    m_v_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    m_v_label->setAlignment(Qt::AlignCenter);
+    m_v_label->setStyleSheet(GetStyleSheetFromResFile(":/res/Badge_value.qss"));
+
+    m_hbl->addWidget(m_l_label);
+    m_hbl->addWidget(m_v_label);
+}
+
+Badge::~Badge()
+{
+    delete m_hbl;
+    delete m_l_label;
+    delete m_v_label;
+}
+
+WarningBox::WarningBox(QString message, QLayout *layout)
+{
+    // Clear all items in layout
+    ClearLayout(layout);
+
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    m_label = new QLabel(message, this);
+    m_label->setAlignment(Qt::AlignCenter);
+    m_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_label->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_warning.qss"));
+    layout->addWidget(m_label);
+}
+
+WarningBox::~WarningBox()
+{
+    delete m_label;
+}
 
 QString FileDialog(QWidget *parent, fdMode mode, const QString& defaultName)
 {
@@ -152,6 +209,21 @@ void MoveWindowWidget::mouseMoveEvent(QMouseEvent *event)
     QPoint delta = event->pos() - startPos;
     QWidget * w = window();
     if(w)
+    {
         w->move(w->pos() + delta);
+        w->adjustSize();
+    }
     QWidget::mouseMoveEvent(event);
 }
+
+void ClearLayout(QLayout *layout)
+{
+    QLayoutItem* item;
+    while ((item = layout->takeAt(0)) != nullptr)
+    {
+       delete item->widget();
+       delete item;
+    }
+}
+
+

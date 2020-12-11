@@ -3,6 +3,9 @@
 #include "qutils.h"
 #include <QPoint>
 #include <Windows.h>
+#include <JlCompress.h>
+
+QNetworkAccessManager *nMgr();
 
 QMouseEvent MouseLeftButtonEvent(QEvent::MouseButtonPress, QPoint(0,0), Qt::LeftButton, nullptr, nullptr);
 
@@ -24,17 +27,25 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::TegraRcmGUI)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);  
 
     // Set a static instance to handle hotplug callback
     Q_ASSERT(!hasInstance());
     m_instance = this;
 
-    // Init acces to builtin resources
+    // Init access to builtin resources
     Q_INIT_RESOURCE(qresources);
 
     // Load settings
     userSettings = new QSettings("nx", "TegraRcmGUI");
+
+    // Start update manager
+    /*
+    qRegisterMetaType<download_t>("download_t");
+    m_um = new UpdateManager(this);
+    connect(m_um, &UpdateManager::new_update_available, this, &TegraRcmGUI::updateAvailable);
+    //m_um->start();
+    */
 
     // Tray icon init
     trayIcon = new QSystemTrayIcon;
@@ -43,22 +54,29 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     connect(trayIcon, &QSystemTrayIcon::activated, this, &TegraRcmGUI::trayIconActivated);
     trayIconMenu = trayIcon->contextMenu();
 
+    m_progressWidget = new qProgressWidget("", this);
+
     // Create a qKourou instance to invoke Kourou methods (asynchronously) using signals and slots
     m_kourou = new QKourou(this, &m_device, this);
 
     m_kourou->autoLaunchAriane = userSettings->value("autoAriane").toBool();
     m_kourou->autoInjectPayload = userSettings->value("autoInject").toBool();
 
-    // Init tabs
+    // Create tabs
     ui->tabWidget->tabBar()->setCursor(Qt::PointingHandCursor);
     ui->push_layout->setAlignment(Qt::AlignTop);
-    ui->pushLayoutWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
+    ui->pushLayoutWidget->setAttribute(Qt::WA_TransparentForMouseEvents);    
     payloadTab = new QPayloadWidget(this);
     ui->tabWidget->addTab(payloadTab, tr("PAYLOAD"));
+    hekateTab = new qHekate(this);
+    ui->tabWidget->addTab(hekateTab, tr("HEKATE / AMS"));
     toolsTab = new qTools(this);
     ui->tabWidget->addTab(toolsTab, tr("TOOLS"));
     settingsTab = new qSettings(this);
     ui->tabWidget->addTab(settingsTab, tr("SETTINGS"));
+    connect(ui->tabWidget, &QTabWidget::currentChanged, [=](int idx) {
+        if (idx == 1) hekateTab->on_tabActivated();
+    });
 
     // Load builtin Ariane payload
     QFile file(":/ariane_bin");
@@ -89,6 +107,7 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     pushTimer->start(1000); // Every second
     m_kourou->initNoDriverDeviceLookUpLoop();
 
+    m_pkgs.setParent(this);
 
     /// GUI inits
     // Set stylesheets
@@ -100,14 +119,22 @@ TegraRcmGUI::TegraRcmGUI(QWidget *parent)
     ui->deviceInfoBoxFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box01.qss"));
 
     ui->closeAppBtn->setCursor(Qt::PointingHandCursor);
-    connect(ui->closeAppBtn, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui->closeAppBtn, SIGNAL(clicked()), this, SLOT(on_appClose()));
+    ui->minimizeAppBtn->setCursor(Qt::PointingHandCursor);
+    connect(ui->minimizeAppBtn, SIGNAL(clicked()), this, SLOT(showMinimized()));
 
     clearDeviceInfo();
+    ui->di_tableWidget->setColumnCount(2);
+    ui->di_tableWidget->setColumnWidth(0, 95);
+    ui->di_tableWidget->setColumnWidth(1, 75);
+    ui->di_tableWidget->horizontalScrollBar()->setStyleSheet("QScrollBar {height:0px;}");
+    ui->di_tableWidget->setStyleSheet(GetStyleSheetFromResFile(":/res/QTableWidget.qss"));
+
     Switch *_switch = new Switch(m_kourou->autoLaunchAriane ? true : false, 52);
     ui->verticalLayout->addWidget(_switch);
     connect(_switch, SIGNAL(clicked(bool)), this, SLOT(on_autoLaunchAriane_toggled(bool)));
 
-    ui->centralwidget->setFixedSize(680, 400);
+    ui->centralwidget->setFixedSize(690, 400);
     this->adjustSize();
 }
 
@@ -118,6 +145,73 @@ TegraRcmGUI::~TegraRcmGUI()
 
     delete trayIcon;
     delete ui;
+
+    //QMainWindow::~QMainWindow();
+}
+
+void TegraRcmGUI::updateAvailable()
+{
+    /*
+    auto queue = m_um->getDownloadQueue();
+    if (!queue.size())
+        return;
+
+    QString message;
+    QTextStream messageStr(&message);
+    messageStr << tr("New updates available :\n\n");
+    QString buff;
+    for (auto item : queue)
+    {
+        if (item.dest_path != buff)
+            messageStr <<  item.dest_path << "\n";
+
+        messageStr << "- " << QFileInfo(item.url.path()).fileName() << "\n";
+        buff = item.dest_path;
+    }
+    if(QMessageBox::question(this, "Update", message, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        //QtConcurrent::run(m_um, &UpdateManager::download_all);
+        //m_um->download_all();
+        auto dialog = new UM_Dialog(m_um, this);
+        dialog->exec();
+    }
+    */
+}
+
+void TegraRcmGUI::on_appClose()
+{
+    if (userSettings->value("minToTray").toBool())
+    {
+        showMinimized();
+        trayIcon->showMessage("", tr("TegraRcmGUI is still running in system tray"), m_device.isReadyToReceivePayload() ? switchOnIcon : switchOffIcon, 3000);
+    }
+    else close();
+}
+
+void TegraRcmGUI::changeEvent(QEvent* e)
+{
+    int t;
+    QEvent::Type typ = e->type();
+    switch (e->type())
+    {
+        case QEvent::LanguageChange:
+            this->ui->retranslateUi(this);
+            break;
+        case QEvent::WindowStateChange:
+        {
+            if (this->windowState() & Qt::WindowMinimized)
+            {
+                if (userSettings->value("minToTray").toBool())
+                    QTimer::singleShot(250, this, SLOT(hide()));
+            }
+            this->adjustSize();
+            break;
+        }
+        default:
+            break;
+    }
+
+    QMainWindow::changeEvent(e);
 }
 
 void TegraRcmGUI::hotPlugEvent(bool added, KLST_DEVINFO_HANDLE deviceInfo)
@@ -139,10 +233,11 @@ void TegraRcmGUI::deviceInfoTimer()
 
 void TegraRcmGUI::on_deviceStateChange()
 {
+    // Device status box
     ui->devStatusLbl_2->setText(tr("DEVICE STATUS"));
     ui->devStatusFrame->setStyleSheet(m_device.getStatus() == CONNECTED ? statusOnStyleSht : statusOffStyleSht);
     ui->rcmStatusLbl_2->setText(m_device.rcmIsReady() ? tr("READY") : tr("OFF"));
-    QString arianeStatus, arianeStyle;
+    QString arianeStatus = "", arianeStyle = "";
     if (m_kourou->arianeIsLoading)
     {
         arianeStatus.append(tr("LOADING"));
@@ -169,16 +264,25 @@ void TegraRcmGUI::on_deviceStateChange()
     if (!m_device.arianeIsReady())
         clearDeviceInfo();
 
-    if (m_device.rcmIsReady() || m_device.arianeIsReady())
+    // Icons
+    if (m_device.isReadyToReceivePayload())
+    {
         trayIcon->setIcon(switchOnIcon);
+        setWindowIcon(switchOnIcon);
+    }
     else
+    {
         trayIcon->setIcon(switchOffIcon);
+        setWindowIcon(switchOffIcon);
+    }
 
-    if (m_device.getStatus() != CONNECTED || !m_device.rcmIsReady())
-        m_deviceInfoAvailable = false;
+    if (m_device.arianeIsReady() && m_pkgs.hasPendingDevInstalls())
+        m_pkgs.devInstall();
 
     payloadTab->on_deviceStateChange();
     toolsTab->on_deviceStateChange();
+    hekateTab->on_deviceStateChange();
+
 }
 
 void TegraRcmGUI::on_autoLaunchAriane_toggled(bool value)
@@ -200,26 +304,17 @@ void TegraRcmGUI::on_autoLaunchAriane_toggled(bool value)
 bool TegraRcmGUI::enableWidget(QWidget *widget, bool enable)
 {
     widget->setEnabled(enable);
+    return true;
 }
 
 void TegraRcmGUI::clearDeviceInfo()
 {
     ui->deviceInfoFrame->setStyleSheet(statusOffStyleSht);
-    ui->deviceInfoLbl->setStyleSheet(statusOffStyleSht);
-    ui->batteryLevel->hide();
-    ui->batteryLevel->setValue(0);
-    ui->burntFusesLbl2->setText("");
-    ui->sdfsLbl2->setText("");
-    ui->sdfsLbl2->setText("");
-    ui->fsTotSizeLbl2->setText("");
-    ui->fsFreeSpaceLbl2->setText("");
+    ui->deviceInfoLbl->setStyleSheet(statusOffStyleSht);    
+
+    ui->di_tableWidget->setRowCount(0);
     if (!m_kourou->autoLaunchAriane)
     {
-        ui->batteryLbl->hide();
-        ui->burntFusesLbl1->hide();
-        ui->sdfsLbl1->hide();
-        ui->fsTotSizeLbl1->hide();
-        ui->fsFreeSpaceLbl1->hide();
         ui->devInfoDisableLbl->show();
     }
     else ui->devInfoDisableLbl->hide();
@@ -227,45 +322,61 @@ void TegraRcmGUI::clearDeviceInfo()
 
 void TegraRcmGUI::on_deviceInfo_received(UC_DeviceInfo di)
 {
-    if (!m_deviceInfoAvailable)
-    {
-        m_deviceInfoAvailable = true;
-        toolsTab->on_deviceStateChange();
-    }
-    else m_deviceInfoAvailable = true;
-    ui->batteryLbl->show();
-    ui->burntFusesLbl1->show();
-    ui->sdfsLbl1->show();
-    ui->fsTotSizeLbl1->show();
-    ui->fsFreeSpaceLbl1->show();
+
     ui->devInfoDisableLbl->hide();
     ui->deviceInfoLbl->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_title01.qss"));
-    ui->batteryLevel->show();
-    ui->batteryLevel->setValue(int(di.battery_capacity));
-    ui->burntFusesLbl2->setText(QString().asprintf("%u", di.burnt_fuses));
-    ui->sdfsLbl2->setText(QString().asprintf("%s", di.sdmmc_initialized ? "Yes" : "No"));
+
+    ui->di_tableWidget->setRowCount(0);
+    auto addTableWidgetRow = [&](const QString &label, const QString &value, bool tooltip = false) {
+        auto di_t = ui->di_tableWidget;
+        di_t->insertRow(di_t->rowCount());
+        auto label_i = new QTableWidgetItem(label + ":");
+        label_i->setTextAlignment(Qt::AlignRight |Qt::AlignVCenter);
+        label_i->setFlags(label_i->flags() ^ Qt::ItemIsEditable);
+        auto value_i = new QTableWidgetItem(value);
+        value_i->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
+        value_i->setFlags(value_i->flags() ^ Qt::ItemIsEditable);
+        if (tooltip) value_i->setToolTip(value);
+        di_t->setItem(di_t->rowCount()-1, 0, label_i);
+        di_t->setItem(di_t->rowCount()-1, 1, value_i);
+    };
+
+    if (strlen(di.deviceId))
+        addTableWidgetRow(tr("NX ID"), QString(di.deviceId), true);
+
+    addTableWidgetRow(tr("Battery charge"), QString().asprintf("%u%%", di.battery_capacity));
+    addTableWidgetRow(tr("Burnt fuses"), QString().asprintf("%u", di.burnt_fuses));
+
+    if (strlen(di.fw_version))
+        addTableWidgetRow(tr("Firmware (SYS)"), QString(di.fw_version) + (di.exFat_driver ? tr(" exFAT") : ""), true);
+
+    if (di.emunand_type)
+        addTableWidgetRow(tr("Emunand"), di.emunand_type == FILEBASED ? tr("File based") : tr("RAW based"));
+
+    if (strlen(di.emu_fw_version))
+        addTableWidgetRow(tr("Firmware (EMU)"), QString(di.emu_fw_version) + (di.emu_exFat_driver ? tr(" exFAT") : ""), true);
+
     if (di.sdmmc_initialized)
     {
         QString fs;
-        if (di.emmc_fs_type == FS_FAT32) fs.append("FAT32");
-        else if (di.emmc_fs_type == FS_EXFAT) fs.append("exFAT");
+        if (di.mmc_fs_type == FS_FAT32) fs.append("FAT32");
+        else if (di.mmc_fs_type == FS_EXFAT) fs.append("exFAT");
         else fs.append("UNKNOWN");
-        ui->sdfsLbl2->setText(fs);
+        addTableWidgetRow(tr("SD Filesystem"), fs);
 
-        qint64 fs_size = 0x200 * (qint64)di.emmc_fs_cl_size * ((qint64)di.emmc_fs_last_cl + 1);
-        qint64 fs_free_space = 0x200 * (qint64)di.emmc_fs_cl_size * (qint64)di.emmc_fs_free_cl;
-        ui->fsTotSizeLbl2->setText(GetReadableSize(fs_size));
-        ui->fsFreeSpaceLbl2->setText(GetReadableSize(fs_free_space));
-    }
-    else
-    {
-        ui->sdfsLbl2->setText("N/A");
-        ui->fsTotSizeLbl2->setText("N/A");
-        ui->fsFreeSpaceLbl2->setText("N/A");
-    }
+        qint64 fs_size = 0x200 * (qint64)di.mmc_fs_cl_size * ((qint64)di.mmc_fs_last_cl + 1);
+        qint64 fs_free_space = 0x200 * (qint64)di.mmc_fs_cl_size * (qint64)di.mmc_fs_free_cl;
+        addTableWidgetRow(tr("FS Total size"), GetReadableSize(fs_size));
+        if (fs_free_space)
+            addTableWidgetRow(tr("FS Free space"), GetReadableSize(fs_free_space));
+    }   
 
     if (di.autoRCM != toolsTab->autoRCM_switch->isActive())
         toolsTab->autoRCM_switch->toggle();
+
+
+    toolsTab->on_deviceStateChange();
+    hekateTab->on_deviceInfo_received();
 }
 
 void TegraRcmGUI::error(int error)
@@ -283,11 +394,22 @@ void TegraRcmGUI::error(int error)
     if (!err_label.size())
         err_label.append(QString().asprintf("Error %d", error));
 
-    QMessageBox::critical(this, "Error", err_label);
+    if (!isVisible())
+        trayIcon->showMessage("", err_label, QSystemTrayIcon::Critical, 3000);
+    else
+        QMessageBox::critical(this, "Error", err_label);
 }
 
-void TegraRcmGUI::pushMessage(QString message)
+void TegraRcmGUI::pushMessage(const QString message)
 {
+    // Send message from tray if app is not visible
+    if (!isVisible())
+    {
+        trayIcon->showMessage("", message, QSystemTrayIcon::Information, 3000);
+        return;
+    }
+
+    // Otherwise, push in-app message
     AnimatedLabel *push = new AnimatedLabel;
     QPropertyAnimation *animation = new QPropertyAnimation(push, "color");
     animation->setDuration(800);
@@ -298,7 +420,6 @@ void TegraRcmGUI::pushMessage(QString message)
     push->setMaximumHeight(80);
     ui->push_layout->addWidget(push);
     animation->start();
-
     push_ts.push_back(QDateTime::currentSecsSinceEpoch());
 }
 
@@ -356,13 +477,12 @@ void TegraRcmGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
     int t;
     switch (reason) {
     case QSystemTrayIcon::Trigger:
-        t = 0;
+        showNormal();
+        activateWindow();
         break;
     case QSystemTrayIcon::DoubleClick:
-        t = 0;
         break;
     case QSystemTrayIcon::MiddleClick:
-        t = 0;
         break;
     case QSystemTrayIcon::Context:
         drawTrayContextMenu();
@@ -383,28 +503,35 @@ void TegraRcmGUI::drawTrayContextMenu()
                       "color: rgb(255, 255, 255);"
                       "}";
 
+    if (nullptr != trayIconMenu)
+        delete trayIconMenu;
 
-    QMenu *menu = new QMenu;
-    menu->setStyleSheet(menu_ss);
-    menu->setContextMenuPolicy(Qt::CustomContextMenu);
-    menu->addAction("Exit",this,SLOT(close()));
+    trayIconMenu = new QMenu;
+    trayIconMenu->setStyleSheet(menu_ss);
+    trayIconMenu->setContextMenuPolicy(Qt::CustomContextMenu);
+    if (!isVisible())
+        trayIconMenu->addAction("Show",this,SLOT(showNormal()));
+    trayIconMenu->addAction("Close",this,SLOT(close()));
+    trayIconMenu->addSeparator();
 
-    QMenu *fav_menu = new QMenu;
-    fav_menu->setStyleSheet(menu_ss);
-    fav_menu->setContextMenuPolicy(Qt::CustomContextMenu);
-    fav_menu->setTitle("Favorites");
-
-    for (payload_t payload : payloadTab->getPayloads())
+    if (m_device.isReadyToReceivePayload())
     {
-        QMenu *p_menu = new QMenu;
-        p_menu->setStyleSheet(menu_ss);
-        p_menu->setContextMenuPolicy(Qt::CustomContextMenu);
-        p_menu->setTitle(payload.name);
-        fav_menu->addMenu(p_menu);
+        QMenu *fav_menu = new QMenu;
+        fav_menu->setStyleSheet(menu_ss);
+        fav_menu->setContextMenuPolicy(Qt::CustomContextMenu);
+        fav_menu->setTitle("Favorites");
+        QSignalMapper* signalmapper = new QSignalMapper();
+        for (payload_t payload : payloadTab->getPayloads())
+        {
+
+            QAction *action = new QAction(payload.name);
+            connect (action, SIGNAL(triggered()), signalmapper, SLOT(map()));
+            signalmapper ->setMapping (action, payload.path);
+            connect (signalmapper , SIGNAL(mapped(QString)), payloadTab, SLOT(on_injectPayload(QString)));
+            fav_menu->addAction(action);
+        }
+        trayIconMenu->addMenu(fav_menu);
     }
-
-    menu->addMenu(fav_menu);
-
-    trayIcon->setContextMenu(menu);
+    trayIcon->setContextMenu(trayIconMenu);
     trayIcon->contextMenu()->popup(QCursor::pos());
 }

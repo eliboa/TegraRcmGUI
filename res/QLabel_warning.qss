@@ -6,6 +6,6 @@ QFrame
 
 QLabel
 {
-    font: 75 9pt "Calibri";
+    font: 8pt "Rubik";
     color: rgb(150, 35, 0);
 }

@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -17,12 +17,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+# Default config is x64
+!contains(CONFIG, ARCH64):!contains(CONFIG, ARCH32) { CONFIG += ARCH64 }
+
+OUT_PWD = $$OUT_PWD
+STATIC_BUILD = $$find(OUT_PWD, "Static")
+!isEmpty(STATIC_BUILD) { DEFINES += QUAZIP_STATIC }
+
 SOURCES += \
     kourou/kourou.cpp \
     kourou/libs/rcm_device.cpp \
     main.cpp \
+    packagemanager.cpp \
+    packages.cpp \
+    qhekate.cpp \
     qkourou.cpp \
+    qobjects/custombutton.cpp \
+    qobjects/hekate_ini.cpp \
     qpayload.cpp \
+    qprogress_widget.cpp \
     qsettings.cpp \
     qtools.cpp \
     qutils.cpp \
@@ -33,40 +46,58 @@ HEADERS += \
     kourou/libs/libusbk_int.h \
     kourou/libs/rcm_device.h \
     kourou/usb_command.h \
+    packagemanager.h \
+    packages.h \
+    qerror.h \
+    qhekate.h \
     qkourou.h \
+    qobjects/custombutton.h \
+    qobjects/hekate_ini.h \
     qpayload.h \
+    qprogress_widget.h \
     qsettings.h \
     qtools.h \
     qutils.h \
     rcm_device.h \
     tegrarcmgui.h \
-    types.h
+    types.h \
 
 FORMS += \
+    packagemanager.ui \
+    qhekate.ui \
     qpayload.ui \
+    qprogress_widget.ui \
     qsettings.ui \
     qtools.ui \
-    tegrarcmgui.ui
+    tegrarcmgui.ui \
 
 TRANSLATIONS = languages/tegrarcmgui_fr.ts
 
-ARCH = 32
-#ARCH = 64
+# libusbK (dll)
+INCLUDEPATH += $$PWD/libs/libusbK/includes
+CONFIG(ARCH64) { LIBS += -L$$PWD/libs/libusbK/bin/lib/amd64/ -llibusbK }
+CONFIG(ARCH32) { LIBS += -L$$PWD/libs/libusbK/bin/lib/x86/ -llibusbK }
 
-contains( ARCH, 64 ) {
-    LIBS += -L$$PWD/../../../../../../../libusbK-dev-kit/bin/lib/amd64/ -llibusbK
+# quazip & zlib
+CMAKE_CXXFLAGS += -std=gnu++14
+INCLUDEPATH += $$PWD/libs/zip_libs/include
+CONFIG(ARCH64) {
+    !isEmpty(STATIC_BUILD) {
+        LIBS += -L$$PWD/libs/zip_libs/lib_x64_static/ -lquazip -lz
+    } else {
+        LIBS += -L$$PWD/libs/zip_libs/lib_x64/ -lquazip -lz
+    }
 }
-contains( ARCH, 32 ) {
-    LIBS += -L$$PWD/../../../../../../../libusbK-dev-kit/bin/lib/x86/ -llibusbK
+CONFIG(ARCH32) {
+    !isEmpty(STATIC_BUILD) {
+        LIBS += -L$$PWD/libs/zip_libs/lib_x86_static/ -lquazip -lz
+    } else {
+        LIBS += -L$$PWD/libs/zip_libs/lib_x86/ -lquazip -lz
+    }
 }
-INCLUDEPATH += $$PWD/../../../../../../../libusbK-dev-kit/includes
-DEPENDPATH += $$PWD/../../../../../../../libusbK-dev-kit/includes
-
-
 
 LIBS += -lsetupapi
 
 RESOURCES += \
     qresources.qrc
 
-DISTFILES +=

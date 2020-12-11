@@ -20,7 +20,7 @@ static const struct {
 	int (*usb_device_write_ep1_in_sync)(const unsigned char* buf, unsigned int len, unsigned int* outTransferred); //0 on success, len clamped at 4096
 
 	int (*usb_device_reset_ep1)(void); //returns 0
-} *rcm_transport = (void*)0x40003114;
+} *rcm_transport = (void*)0x40003114;                          
 
 bool rcm_usb_device_ready()
 {
@@ -50,9 +50,9 @@ void rcm_usb_device_reset_ep1(void)
 	rcm_transport->usb_device_reset_ep1();
 }
 
-static const char READY_NOTICE[] = "READY.\n";
+//static const unsigned char READY_NOTICE[] = "READY.\n";
 void rcm_ready_notice()
 {
 	unsigned int b;
-	rcm_usb_device_write_ep1_in_sync(READY_NOTICE, 7, &b);
+    rcm_usb_device_write_ep1_in_sync((const unsigned char*)"READY.\n", 7, &b);
 }

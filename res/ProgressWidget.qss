@@ -1,0 +1,18 @@
+QDialog
+{
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+}
+
+QFrame
+{
+    background-color: rgb(100, 100, 100);
+    border-radius: 10px;
+    border-color: rgb(0, 0, 0);
+}
+
+QLabel
+{
+    font: 8pt "Rubik";
+    color: rgb(255, 255, 255);
+}

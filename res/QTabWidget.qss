@@ -10,9 +10,8 @@ QTabWidget::tab-bar
 QTabBar::tab
 {
     color: rgb(255, 255, 255);
-
     border: 0px;
-    min-width: 10ex;
+    min-width: 6em;
     padding: 6px; /* Padding inside each tab */
     font: 75 10pt "MS Shell Dlg 2";
     color: rgb(255, 255, 255);
@@ -24,6 +23,7 @@ QTabBar::tab:selected {
 QLabel
 {
     color: rgb(255, 255, 255);
+    font: 9pt "Rubik";
 }
 QToolTip
 {

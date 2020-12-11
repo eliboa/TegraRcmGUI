@@ -12,13 +12,24 @@ qSettings::qSettings(TegraRcmGUI *parent) : QWidget(parent),
 
     /// Stylesheets
     // Apply stylesheet to all buttons
-    QString btnSs = GetStyleSheetFromResFile(":/res/QPushButton.qss");
+    auto btnSs = GetStyleSheetFromResFile(":/res/QPushButton.qss");
     auto buttons = this->findChildren<QPushButton*>();
     for (int i = 0; i < buttons.count(); i++)
     {
         buttons.at(i)->setStyleSheet(btnSs);
         buttons.at(i)->setCursor(Qt::PointingHandCursor);
     }
+
+    for (auto it : {ui->minTrayFrame, ui->driverFrame, ui->PkgmFrame})
+        it->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box02.qss"));
+
+    for (auto it : { ui->minTrayLbl, ui->driverLbl, ui->PkgmLbl})
+        it->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_title02.qss"));
+
+    // Switch
+    minTraySwitch = new Switch(parent->userSettings->contains("minToTray") && parent->userSettings->value("minToTray").toBool() ? true : false, 50);
+    ui->minTrayLayout->addWidget(minTraySwitch);
+    connect(minTraySwitch, SIGNAL(clicked()), this, SLOT(on_minToTraySwitch_toggled()));
 }
 
 qSettings::~qSettings()
@@ -41,7 +52,10 @@ void qSettings::on_installDriverButton_clicked()
 
     QFile file(q_path);
     if (!file.exists())
+    {
+        QMessageBox::critical(this, "Error", tr("InstallDriver.exe not found!\nExpected location: ") + q_path);
         return;
+    }
 
     std::wstring w_path = q_path.toStdWString();
     LPCWSTR path = (const wchar_t*) w_path.c_str();
@@ -59,4 +73,17 @@ void qSettings::on_installDriverButton_clicked()
     {
         CloseHandle(shExInfo.hProcess);
     }
+}
+
+void qSettings::on_minToTraySwitch_toggled()
+{
+    parent->userSettings->setValue("minToTray", minTraySwitch->getState());
+}
+
+void qSettings::on_packagesButton_clicked()
+{
+    auto dialog = new PackageManager(&parent->m_pkgs, parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->exec();
+    //delete dialog;
 }

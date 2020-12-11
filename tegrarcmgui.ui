@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>435</height>
+    <width>690</width>
+    <height>428</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>690</width>
+    <height>420</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>690</width>
+    <height>440</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>TegraRcmGUI</string>
@@ -23,7 +35,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>200</x>
       <y>30</y>
       <width>481</width>
       <height>371</height>
@@ -167,275 +179,17 @@ QLabel{font: 75 11pt &quot;Calibri&quot;; color: rgb(255, 255, 255);}
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
-   <widget class="QGroupBox" name="devInfoBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>150</y>
-      <width>171</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 10pt &quot;Calibri&quot;;
-border:0px;
-QLabel{
-background-color: rgb(255, 255, 255);
-color: rgb(37, 37, 38);
-}</string>
-    </property>
-    <property name="title">
-     <string/>
-    </property>
-    <property name="flat">
-     <bool>true</bool>
-    </property>
-    <widget class="QFrame" name="deviceInfoBoxFrame">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>171</width>
-       <height>241</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <widget class="QLabel" name="batteryLbl">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;
-QLabel{
-background-color: rgb(255, 255, 255);
-color: rgb(37, 37, 38);
-}</string>
-      </property>
-      <property name="text">
-       <string>Battery charge:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="burntFusesLbl1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;
-</string>
-      </property>
-      <property name="text">
-       <string>Burnt fuses:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sdfsLbl1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;
-</string>
-      </property>
-      <property name="text">
-       <string>SD Filesystem:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="fsTotSizeLbl1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string>FS Total size:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="fsFreeSpaceLbl1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>100</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string>FS Free space:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="fsFreeSpaceLbl2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>100</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="fsTotSizeLbl2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>80</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sdfsLbl2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>60</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="burntFusesLbl2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>40</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QProgressBar" name="batteryLevel">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>20</y>
-        <width>51</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-	 text-align: center;
-}
-
-QProgressBar::chunk {
-    background-color: #009688;
-	width: 1px;
-}</string>
-      </property>
-      <property name="value">
-       <number>24</number>
-      </property>
-      <property name="format">
-       <string>%p%</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="devInfoDisableLbl">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>151</width>
-        <height>221</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
-      </property>
-      <property name="text">
-       <string>Enable Ariane autoboot 
- to display device info</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </widget>
-   </widget>
    <widget class="QFrame" name="deviceInfoFrame">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>150</y>
-      <width>100</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-
-</string>
+     <string notr="true"/>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -447,9 +201,9 @@ QProgressBar::chunk {
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
-       <width>100</width>
-       <height>20</height>
+       <y>-1</y>
+       <width>101</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -469,7 +223,7 @@ font: 9pt &quot;Calibri&quot;;</string>
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>171</width>
+      <width>181</width>
       <height>101</height>
      </rect>
     </property>
@@ -492,7 +246,7 @@ font: 9pt &quot;Calibri&quot;;</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Calibri&quot;;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>RCM status:</string>
@@ -511,8 +265,7 @@ font: 9pt &quot;Calibri&quot;;</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Calibri&quot;;
-</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>Ariane autoboot:</string>
@@ -530,10 +283,6 @@ font: 9pt &quot;Calibri&quot;;</string>
        <height>20</height>
       </rect>
      </property>
-     <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Calibri&quot;;
-</string>
-     </property>
      <property name="text">
       <string>Ariane status:</string>
      </property>
@@ -545,9 +294,9 @@ font: 9pt &quot;Calibri&quot;;</string>
    <widget class="QWidget" name="pushLayoutWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>380</x>
       <y>20</y>
-      <width>291</width>
+      <width>311</width>
       <height>381</height>
      </rect>
     </property>
@@ -565,7 +314,7 @@ font: 9pt &quot;Calibri&quot;;</string>
      <rect>
       <x>-1</x>
       <y>0</y>
-      <width>685</width>
+      <width>691</width>
       <height>21</height>
      </rect>
     </property>
@@ -583,15 +332,15 @@ font: 9pt &quot;Calibri&quot;;</string>
       <rect>
        <x>10</x>
        <y>0</y>
-       <width>151</width>
+       <width>191</width>
        <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">font: 75 8pt &quot;Rubik&quot;;</string>
      </property>
      <property name="text">
-      <string>TegraRcmGUI v3.0</string>
+      <string>TegraRcmGUI v3.0-a by eliboa</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -600,7 +349,7 @@ font: 9pt &quot;Calibri&quot;;</string>
     <widget class="QPushButton" name="closeAppBtn">
      <property name="geometry">
       <rect>
-       <x>655</x>
+       <x>665</x>
        <y>0</y>
        <width>21</width>
        <height>20</height>
@@ -618,11 +367,108 @@ font: 9pt &quot;Calibri&quot;;</string>
       <rect>
        <x>-1</x>
        <y>0</y>
-       <width>651</width>
+       <width>641</width>
        <height>20</height>
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="minimizeAppBtn">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>0</y>
+       <width>21</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string>-</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="deviceInfoBoxFrame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>160</y>
+      <width>181</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="devInfoDisableLbl">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>161</width>
+       <height>211</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enable Ariane autoboot 
+ to display device info</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="di_tableWidget">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>15</y>
+       <width>171</width>
+       <height>220</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="autoScroll">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectItems</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>100</number>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderMinimumSectionSize">
+      <number>18</number>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>18</number>
+     </attribute>
+    </widget>
+    <zorder>di_tableWidget</zorder>
+    <zorder>devInfoDisableLbl</zorder>
    </widget>
    <zorder>statusBoxFrame</zorder>
    <zorder>tabWidget</zorder>
@@ -630,10 +476,10 @@ font: 9pt &quot;Calibri&quot;;</string>
    <zorder>rcmStatusFrame</zorder>
    <zorder>arianeStatusFrame</zorder>
    <zorder>verticalLayoutWidget</zorder>
-   <zorder>devInfoBox</zorder>
-   <zorder>deviceInfoFrame</zorder>
    <zorder>pushLayoutWidget</zorder>
    <zorder>titleBarFrame</zorder>
+   <zorder>deviceInfoBoxFrame</zorder>
+   <zorder>deviceInfoFrame</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="styleSheet">

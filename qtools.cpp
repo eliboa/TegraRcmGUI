@@ -20,18 +20,14 @@ qTools::qTools(TegraRcmGUI *parent) : QWidget(parent),
     }
 
     ui->autoRcmFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box02.qss"));
-    ui->genricToolFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QFrame_box02.qss"));
     ui->autoRcm_warningFrame->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_warning.qss"));
-    ui->autoRcmTitleLbl->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_title02.qss"));
+    ui->autoRcmTitleLbl->setStyleSheet(GetStyleSheetFromResFile(":/res/QLabel_title02.qss"));    
 
     // Buttons
     autoRCM_switch = new Switch(false, 50);
     ui->autoRcmLayout->addWidget(autoRCM_switch);
     connect(autoRCM_switch, SIGNAL(clicked()), this, SLOT(on_autoRcmSwitchToggled()));
 
-    Switch *_switch2 = new Switch(false, 50);
-    ui->genricToolLayout->addWidget(_switch2);
-    //connect(_switch, SIGNAL(clicked()), this, SLOT(on_autoInject_toggled()));
 }
 
 qTools::~qTools()
@@ -43,7 +39,7 @@ void qTools::on_deviceStateChange()
 {
     //autoRcm_arianeLbl
 
-    if (!m_device->arianeIsReady() || !parent->isDeviceInfoAvailable())
+    if (!m_device->arianeIsReady() || !m_device->isDeviceInfoAvailable())
     {
         QString label;
         if (m_device->arianeIsReady())

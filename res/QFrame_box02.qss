@@ -8,7 +8,7 @@ QFrame
 QLabel 
 {
     border-radius: 0px;
-    font: 10pt "Calibri";
+    font: 8pt "Rubik";
     background-color: rgb(41, 41, 41);
     color: rgb(255, 255, 255);
 }
@@ -16,7 +16,7 @@ QLineEdit
 {
     border-color: rgb(0, 0, 0);
     background-color: rgb(60, 60, 60);
-    font: 9pt "Calibri";
+    font: 8pt "Rubik";
     border-radius: 2px; 
     color: rgb(255, 255, 255);
 }
