@@ -10,11 +10,6 @@ C++ GUI for [TegraRcmSmash](https://github.com/rajkosto/TegraRcmSmash) by [rajko
   
 The RCM exploit only works on "unpatched" units, i.e manufactured before July 2018. To check if your Switch is patched, use https://ismyswitchpatched.com/
 
-## What's new ? (July 2020)
-I'm currently working on a new release "TegraRcmGUI v3". The entire source code will be rewritten and new features will be added. Stay tuned.
-In the meantime, issues are temporarily closed and there will be no bug fixes until next release.
-I'm also looking for beta-testers, so if you're willing to help, please send me en email (eliboa@gmail.com).
-
 ## Features
 - Inject payloads
 - Manage favorites
