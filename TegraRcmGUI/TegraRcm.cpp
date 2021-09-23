@@ -37,6 +37,7 @@ TegraRcm::TegraRcm(CDialog* pParent /*=NULL*/)
 {
 	m_Parent = pParent;
 	m_hWnd = AfxGetMainWnd()->GetSafeHwnd();
+	this->LOGGING_CURR = GetPreset("LOGGING") == "TRUE";
 	GetFavorites();
 	//SendUserMessage("Waiting for device in RCM mode");
 }
@@ -543,8 +544,7 @@ void TegraRcm::SaveFavorites()
 void TegraRcm::AppendLog(string message)
 {
 
-	// DISABLED
-	return;
+	if (!this->LOGGING_CURR) return;
 
 
 	// Get time

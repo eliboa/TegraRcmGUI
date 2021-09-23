@@ -37,6 +37,13 @@ For other platforms, you can use :
 ## Issue / Suggestion
 Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report a bug or submit a suggestion.   
 
+## Development
+
+Install the [libusbk dev kit](https://sourceforge.net/projects/libusbk/) using the setup program.
+If not installed in the default `C:\libusbK-dev-kit` location, then create an encironment variable with the other path as the value.
+The project seems to survive a target upgrade from the tools in Visual Studio 2017 to 2019.
+Make sure with the library's include files path correct, the actual library name still exists in the Project Settings/Properties > Linker > Input > Additional Dependencies list as `libusbK.lib`.
+
 ## How to backup/restore your Nintendo Switch's NAND ?
 
  1) Use [memloader](https://github.com/rajkosto/memloader) v3 to mount eMMC on your computer
