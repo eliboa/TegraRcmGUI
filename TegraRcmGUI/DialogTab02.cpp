@@ -144,16 +144,16 @@ void DialogTab02::OnBnClickedMountSd()
 	switch (pmyComboBox->GetCurSel())
 	{
 	case 0:
-		_tcscpy(args, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_boot0.ini"));
+		_tcscpy_s(args, 255, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_boot0.ini"));
 		break;
 	case 1:
-		_tcscpy(args, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_boot1.ini"));
+		_tcscpy_s(args, 255, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_boot1.ini"));
 		break;
 	case 2:
-		_tcscpy(args, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_emmc.ini"));
+		_tcscpy_s(args, 255, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_emmc.ini"));
 		break;
 	default:
-		_tcscpy(args, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_sd.ini"));
+		_tcscpy_s(args, 255, TEXT(".\\tools\\memloader\\memloader_usb.bin -r --dataini=.\\tools\\memloader\\ums_sd.ini"));
 		break;
 	}
 	
