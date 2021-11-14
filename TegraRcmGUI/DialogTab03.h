@@ -44,6 +44,7 @@ public:
 	afx_msg void OnClickedMinToTray();
 	afx_msg void OnBnClickedInstallDriver();
 	afx_msg void OnBnClickedWinstart();
+	afx_msg void OnClickedLogging();
 	void CreateLink();
 	afx_msg void CleanRegestry();
 

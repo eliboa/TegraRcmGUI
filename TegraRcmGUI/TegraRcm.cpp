@@ -37,6 +37,7 @@ TegraRcm::TegraRcm(CDialog* pParent /*=NULL*/)
 {
 	m_Parent = pParent;
 	m_hWnd = AfxGetMainWnd()->GetSafeHwnd();
+	this->LOGGING_CURR = GetPreset("LOGGING") == "TRUE";
 	GetFavorites();
 	//SendUserMessage("Waiting for device in RCM mode");
 }
@@ -543,8 +544,7 @@ void TegraRcm::SaveFavorites()
 void TegraRcm::AppendLog(string message)
 {
 
-	// DISABLED
-	return;
+	if (!this->LOGGING_CURR) return;
 
 
 	// Get time
@@ -869,9 +869,8 @@ int TegraRcm::Smasher(TCHAR args[4096], BOOL bInheritHandles)
 	CString csPath2(csPath);
 	csPath.Append(TEXT(".\\TegraRcmSmash.exe "));
 	TCHAR cmd[4096];
-	_tcscpy_s(cmd, csPath);
+	_tcscpy_s(cmd, 4095, csPath);
 	lstrcat(cmd, args);
-
 
 	SECURITY_ATTRIBUTES sa;
 	sa.nLength = sizeof(sa);
@@ -1126,7 +1125,7 @@ char* TegraRcm::GetRelativeFilename(char *currentDirectory, char *absoluteFilena
 	if (currentDirectory[0] != absoluteFilename[0])
 	{
 		// not on the same drive, so only absolute filename will do
-		strcpy(relativeFilename, absoluteFilename);
+		strcpy_s(relativeFilename, MAX_FILENAME_LEN, absoluteFilename);
 		return relativeFilename;
 	}
 	// they are on the same drive, find out how much of the current directory
@@ -1147,7 +1146,7 @@ char* TegraRcm::GetRelativeFilename(char *currentDirectory, char *absoluteFilena
 			// file name should not have a leading one...
 			i++;
 		}
-		strcpy(relativeFilename, &absoluteFilename[i]);
+		strcpy_s(relativeFilename, MAX_FILENAME_LEN, &absoluteFilename[i]);
 		return relativeFilename;
 	}
 	// The file is not in a child directory of the current directory, so we
@@ -1192,6 +1191,6 @@ char* TegraRcm::GetRelativeFilename(char *currentDirectory, char *absoluteFilena
 		relativeFilename[rfMarker++] = SLASH;
 	}
 	// copy the rest of the filename into the result string
-	strcpy(&relativeFilename[rfMarker], &absoluteFilename[afMarker]);
+	strcpy_s(&relativeFilename[rfMarker], MAX_FILENAME_LEN, &absoluteFilename[afMarker]);
 	return relativeFilename;
 }

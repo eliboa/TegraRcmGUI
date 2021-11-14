@@ -37,6 +37,10 @@ For other platforms, you can use :
 ## Issue / Suggestion
 Please open new [issue](https://github.com/eliboa/TegraRcmGUI/issues) to report a bug or submit a suggestion.   
 
+## Development
+
+Install the [libusbk dev kit](https://sourceforge.net/projects/libusbk/) using the setup program, then create an environment variable `LIBUSBK_DIR` with the installation path as the value.
+
 ## How to backup/restore your Nintendo Switch's NAND ?
 
  1) Use [memloader](https://github.com/rajkosto/memloader) v3 to mount eMMC on your computer

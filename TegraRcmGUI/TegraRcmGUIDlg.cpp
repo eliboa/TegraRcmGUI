@@ -101,6 +101,10 @@ END_MESSAGE_MAP()
 //
 BOOL CTegraRcmGUIDlg::OnInitDialog()
 {
+
+	m_TegraRcm = new TegraRcm(this);
+	m_TegraRcm->AppendLog("new TegraRcm()");
+
 	CDialog::OnInitDialog();
 
 	// Accessibility
@@ -186,9 +190,6 @@ BOOL CTegraRcmGUIDlg::OnInitDialog()
 	// Set icons
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
-
-	m_TegraRcm = new TegraRcm(this);
-	m_TegraRcm->AppendLog("new TegraRcm()");
 
 	// Kill other running process of app
 	m_TegraRcm->KillRunningProcess(TEXT("TegraRcmGUI.exe"));

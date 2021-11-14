@@ -45,6 +45,14 @@ BOOL DialogTab03::OnInitDialog()
 		checkbox->SetCheck(BST_CHECKED);
 	}
 
+	value = m_TegraRcm->GetPreset("LOGGING");
+	if (value == "TRUE")
+	{
+		m_TegraRcm->LOGGING_CURR = TRUE;
+		CMFCButton* checkbox = (CMFCButton*)GetDlgItem(LOGGING);
+		checkbox->SetCheck(BST_CHECKED);
+	}
+
 	TCHAR szPath[MAX_PATH];
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath)))
 	{
@@ -66,6 +74,7 @@ BEGIN_MESSAGE_MAP(DialogTab03, CDialogEx)
 	ON_BN_CLICKED(MIN_TO_TRAY, &DialogTab03::OnClickedMinToTray)
 	ON_BN_CLICKED(ID_INSTALL_DRIVER, &DialogTab03::OnBnClickedInstallDriver)
 	ON_BN_CLICKED(RUN_WINSTART, &DialogTab03::OnBnClickedWinstart)
+	ON_BN_CLICKED(LOGGING, &DialogTab03::OnClickedLogging)
 	//ON_BN_CLICKED(IDC_BUTTON2, &DialogTab03::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
@@ -109,6 +118,20 @@ void DialogTab03::OnClickedMinToTray()
 		if (IsCheckChecked) m_TegraRcm->SetPreset("MIN_TO_TRAY", "TRUE");
 		else m_TegraRcm->SetPreset("MIN_TO_TRAY", "FALSE");
 		m_TegraRcm->MIN_TO_TRAY_CURR = IsCheckChecked;
+	}
+}
+
+
+void DialogTab03::OnClickedLogging()
+{
+	// Get Minimize to tray checkbox value (checked, unchecked)
+	CButton* m_ctlCheck = (CButton*)GetDlgItem(LOGGING);
+	BOOL IsCheckChecked = (m_ctlCheck->GetCheck() == 1) ? true : false;
+	if (m_TegraRcm->LOGGING_CURR != IsCheckChecked)
+	{
+		if (IsCheckChecked) m_TegraRcm->SetPreset("LOGGING", "TRUE");
+		else m_TegraRcm->SetPreset("LOGGING", "FALSE");
+		m_TegraRcm->LOGGING_CURR = IsCheckChecked;
 	}
 }
 
