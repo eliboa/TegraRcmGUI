@@ -31,6 +31,7 @@ This UI is **Windows-only**.
 For other platforms, you can use :
 - [Fusée Launcher](https://github.com/Cease-and-DeSwitch/fusee-launcher) (GNU/Linux)
 - [NXBoot](https://mologie.github.io/nxboot/) (OS X, iOS)
+- [JTegraNX](https://github.com/dylwedma11748/JTegraNX) (Windows, OS X, GNU/Linux)
 - [NXLoader](https://github.com/DavidBuchanan314/NXLoader) (Android)
 - [Web Fusée Launcher](https://fusee-gelee.firebaseapp.com/) (Cross-platform, only works with Chrome)
 
